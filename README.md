@@ -44,20 +44,20 @@ El proyecto incluye scripts automatizados para entornos locales y de producción
 
    ```bash
    cd base-datos/scripts/local
-```
+   
 
 Ejecuta el constructor maestro (requiere cliente psql):
 
-```bash
-sudo -u postgres psql -f build.sql
-```
+   ```bash
+   sudo -u postgres psql -f build.sql
+   ```
 
-Opción B: Producción (Seed Limpio)
+### Opción B: Producción (Seed Limpio)
 Para restaurar la base de datos a un estado de fábrica (5 sucursales, 10 empleados, catálogos limpios):
 
-```bash
-psql -d citas -f base-datos/scripts/local/respaldo_produccion.sql
-```
+   ```bash
+   psql -d citas -f base-datos/scripts/local/respaldo_produccion.sql
+   ```
 
 ▶️ Ejecución y Despliegue
 1. Despliegue con Docker (Recomendado)
