@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgis/postgis:14-3.4
+    container_name: agenda_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root420
+      POSTGRES_DB: citas
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Autoejecuta tus scripts iniciales si la DB está vacía
+      - ./base-datos/esquema.sql:/docker-entrypoint-initdb.d/1-esquema.sql
+      - ./base-datos/scripts/local/catalogos.sql:/docker-entrypoint-initdb.d/2-catalogos.sql
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: agenda_backend
+    ports:
+      - "8080:8080"
+    environment:
+      # Sobrescribimos el application.properties para apuntar al contenedor 'db'
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/citas
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=root420
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

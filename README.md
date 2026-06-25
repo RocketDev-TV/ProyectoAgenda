@@ -41,10 +41,13 @@ El proyecto incluye scripts automatizados para entornos locales y de producción
 
 ### Opción A: Entorno Local (Desarrollo)
 1. Navega a la carpeta de scripts:
+
    ```bash
    cd base-datos/scripts/local
 ```
+
 Ejecuta el constructor maestro (requiere cliente psql):
+
 ```bash
 sudo -u postgres psql -f build.sql
 ```
@@ -55,13 +58,17 @@ Para restaurar la base de datos a un estado de fábrica (5 sucursales, 10 emplea
 ```bash
 psql -d citas -f base-datos/scripts/local/respaldo_produccion.sql
 ```
+
 ▶️ Ejecución y Despliegue
 1. Despliegue con Docker (Recomendado)
 Levanta la base de datos y el backend con un solo comando utilizando el docker-compose.yml incluido:
+
 ```bash 
 ▶docker-compose up -d --build
 ```
+
 Entorno Local (IDE / Terminal)
+
 ```bash 
 mvn spring-boot:run
 ```
@@ -69,12 +76,14 @@ Acceso: http://localhost:8080
 
 3. Producción (Linux / Azure VM)
 Para ejecución en segundo plano (Daemon) asegurando la zona horaria correcta:
+
 ```bash 
 nohup java -Duser.timezone=America/Mexico_City -jar target/sistema-citas-0.0.1-SNAPSHOT.jar \
   --spring.datasource.url=jdbc:postgresql://localhost:5432/citas \
   --spring.datasource.username=postgres \
   --spring.datasource.password=TU_PASSWORD > log.txt 2>&1 &
 ```
+
 🔌 Endpoints Principales
 | Método | Endpoint | Descripción |
 | :--- | :--- | :--- |
