@@ -46,7 +46,7 @@ El proyecto incluye scripts automatizados para entornos locales y de producción
    cd base-datos/scripts/local
    ```
 
-# Ejecuta el constructor maestro (requiere cliente psql):
+### Ejecuta el constructor maestro (requiere cliente psql):
 
    ```bash
    sudo -u postgres psql -f build.sql
