@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: agenda-web
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Cambiamos init.sql por tu archivo real de tablas:
+      - ./database/create.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agenda-web"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/agenda-web
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      db:
+        condition: service_healthy
+
+    develop:
+      watch:
+        # Sincroniza vistas HTML de Thymeleaf inmediatamente
+        - path: ./src/main/resources/templates
+          action: sync
+          target: /app/src/main/resources/templates
+        # ─── CAMBIA ESTA LÍNEA (Agrega src/main/) ───
+        - path: ./src/main/webapp
+          action: sync
+          target: /app/webapp
+        # Si modificas dependencias, reconstruye todo
+        - path: ./pom.xml
+          action: rebuild
+        # Si modificas lógica en clases Java, reconstruye todo
+        - path: ./src/main/java
+          action: rebuild
+
+volumes:
+  postgres_data:
