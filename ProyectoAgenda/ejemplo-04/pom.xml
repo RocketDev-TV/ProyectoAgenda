@@ -56,7 +56,6 @@
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
   </dependencies>
-
   <build>
     <finalName>ejemplo-04</finalName>
 
@@ -104,3 +103,4 @@
     </pluginManagement>
   </build>
 </project>
+

@@ -20,7 +20,9 @@
         <br>
         <div>
             <label for="value">Valor / Cuenta / Teléfono:</label>
-            <input type="text" id="value" th:field="*{value}" placeholder="Ej: @mi_usuario o correo@correo.com" required />
+            <input type="text" id="value" th:field="*{value}" required />
+
+            <p th:if="${#fields.hasErrors('value')}" th:errors="*{value}" style="color: red;"></p>
         </div>
         <br>
         <div>

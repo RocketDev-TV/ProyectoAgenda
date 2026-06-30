@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.servlet.http.HttpSession;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -36,17 +37,34 @@ public class UsersCtrl {
         return "users/index";
     }
 
+
+    //denegar la edicion de usuarios ajenos
     @GetMapping("/users/{id}/edit")
-    public String edit(@PathVariable("id") Integer idUsuario,  Model model) {
-        Optional<User> resultadoUser= userBs.findById(idUsuario);
-        if(resultadoUser.isPresent()) {
+    public String edit(@PathVariable("id") Integer idUsuario, Model model, HttpSession session) {
+        // 1. Recuperar el usuario usando la clase original de tu sesión
+        User usuarioSesion = (User) session.getAttribute("usuarioSesion");
+
+        // 2. Si no hay sesión iniciada, rebota al login
+        if (usuarioSesion == null) {
+            return "redirect:/login";
+        }
+
+       if (!usuarioSesion.getId().equals(idUsuario)) {
+            return "redirect:/contacts?error=NoAutorizado";
+        }
+
+        Optional<User> resultadoUser = userBs.findById(idUsuario);
+        if (resultadoUser.isPresent()) {
             model.addAttribute("id", resultadoUser.get().getId());
             model.addAttribute("userDto", UpdateUserDto.fromEntity(resultadoUser.get()));
         } else {
-            model.addAttribute("userDto", new UpdateUserDto());
+            return "redirect:/contacts";
         }
+
         return "users/edit";
     }
+
+
 
     @PutMapping("/users/{id}")
     public String update(@PathVariable("id") Integer idUsuario, UpdateUserDto updateUserDto, Model model, RedirectAttributes redirectAttributes) {

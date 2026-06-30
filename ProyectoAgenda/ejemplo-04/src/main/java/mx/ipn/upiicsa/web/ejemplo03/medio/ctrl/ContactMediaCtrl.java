@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 
 @Controller
 public class ContactMediaCtrl {
@@ -49,14 +51,23 @@ public class ContactMediaCtrl {
     @PostMapping("/contacts/{idContact}/media")
     public String store(
             @PathVariable("idContact") Integer idContact,
-            RegisterContactMediumDto dto,
+            @Valid @ModelAttribute("registerContactMediumDto")RegisterContactMediumDto dto,
+            BindingResult bindingResult,
+            Model model,
             RedirectAttributes redirectAttributes,
             HttpSession session
     ) {
         if (session.getAttribute("usuarioSesion") == null) {
             return "redirect:/login";
         }
-
+        if (bindingResult.hasErrors()) {
+            // Volvemos a cargar las variables necesarias para pintar la vista de creación de nuevo
+            model.addAttribute("idContact", idContact);
+            model.addAttribute("types", contactTypeBs.getAllTypes());
+            // Regresamos al usuario al formulario (el DTO llevará el mensaje de error arrastrando)
+            return "contacts/media/create";
+        }
+        //flujo normal
         ContactMedium contactMedium = dto.toEntity();
         contactMedium.setIdContact(idContact);
         contactMediumBs.save(contactMedium);

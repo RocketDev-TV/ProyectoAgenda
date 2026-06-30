@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto.RegisterContactDto;
 import mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto.UpdateContactDto;
 import java.util.Optional;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl.dto.UserDto;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,7 @@ import java.util.List;
 public class ContactsCtrl {
 
     @Autowired
-    ContactsBs contactsBs; // Este es el nombre real con 's'
+    ContactsBs contactsBs;
 
     //lectura
     @GetMapping("/contacts")

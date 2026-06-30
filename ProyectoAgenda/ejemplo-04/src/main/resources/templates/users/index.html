@@ -25,7 +25,9 @@
         <td th:text="${persona.lastName}">Pérez</td>
         <td th:text="${persona.secondLastName}">Gómez</td>
         <td th:text="${persona.username}">juanpg</td>
-        <td><a th:href="@{/users/{id}/edit(id=${persona.id})}">Editar</a><a th:href="@{/users/{id}/destroy(id=${persona.id})}">Eliminar</a></td>
+        <td><a th:href="@{/users/{id}/edit(id=${persona.id})}">Editar</a>
+            <!--<a th:href="@{/users/{id}/destroy(id=${persona.id})}">Eliminar</a>-->
+        <td>
     </tr>
     </tbody>
 </table>
