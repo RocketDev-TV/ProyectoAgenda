@@ -10,7 +10,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # Cambiamos init.sql por tu archivo real de tablas:
-      - ./database/create.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./database/create.sql:/docker-entrypoint-initdb.d/01-create.sql
+      # Seed para poblar la bdd
+      - ./database/poblado.sql:/docker-entrypoint-initdb.d/02-seed.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d agenda-web"]
       interval: 5s
@@ -21,6 +23,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      network: host
     ports:
       - "8080:8080"
     environment:

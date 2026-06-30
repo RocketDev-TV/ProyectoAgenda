@@ -26,9 +26,15 @@ public class ContactMediumBs {
         return contactMediumDao.findById(id);
     }
 
-   //guardar o actualizar
+   //guardar (insert)
     @Transactional
     public ContactMedium save(ContactMedium contactMedium) {
+        return contactMediumDao.save(contactMedium);
+    }
+
+    // update: el DAO reutiliza save(); JPA detecta el id presente y emite UPDATE
+    @Transactional
+    public ContactMedium update(ContactMedium contactMedium) {
         return contactMediumDao.save(contactMedium);
     }
 

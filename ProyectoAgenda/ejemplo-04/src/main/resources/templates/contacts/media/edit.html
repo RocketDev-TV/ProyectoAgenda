@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Medio de Contacto</title>
+</head>
+<body>
+<div>
+    <h2>Editar Medio de Contacto</h2>
+
+    <!--
+        PUT via form HTML: Spring MVC intercepta el campo oculto _method=PUT
+        gracias a HiddenHttpMethodFilter (ya habilitado en application.properties).
+        La acción apunta a /contacts/{idContact}/media/{id} con el id del medio.
+    -->
+    <form th:action="@{/contacts/{idContact}/media/{id}(idContact=${idContact}, id=${updateContactMediumDto.id})}"
+          th:object="${updateContactMediumDto}"
+          method="POST">
+
+        <input type="hidden" name="_method" value="PUT" />
+
+        <div>
+            <label for="type">Tipo de Medio:</label>
+            <select id="type" th:field="*{idType}" required>
+                <option value="" disabled>-- Seleccione una opción --</option>
+                <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.name}"></option>
+            </select>
+        </div>
+        <br>
+        <div>
+            <label for="value">Valor / Cuenta / Teléfono:</label>
+            <input type="text" id="value" th:field="*{value}" required />
+        </div>
+        <br>
+        <div>
+            <button type="submit">Actualizar Medio</button>
+            <a th:href="@{/contacts/{id}/media(id=${idContact})}">Cancelar</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.ContactMedium;
 import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.implementation.ContactMediumBs;
 import mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto.RegisterContactMediumDto;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto.UpdateContactMediumDto;
 import mx.ipn.upiicsa.web.ejemplo03.tipo.bs.implementation.ContactTypeBs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
+import java.util.Optional;
 
 @Controller
 public class ContactMediaCtrl {
@@ -89,6 +91,52 @@ public class ContactMediaCtrl {
 
         contactMediumBs.deleteById(id);
         redirectAttributes.addFlashAttribute("message", "Medio de contacto eliminado correctamente");
+        return "redirect:/contacts/" + idContact + "/media";
+    }
+
+    // Carga el formulario de edición con los datos actuales del medio
+    @GetMapping("/contacts/{idContact}/media/{id}/edit")
+    public String edit(
+            @PathVariable("idContact") Integer idContact,
+            @PathVariable("id") Integer id,
+            Model model,
+            HttpSession session
+    ) {
+        if (session.getAttribute("usuarioSesion") == null) {
+            return "redirect:/";
+        }
+
+        Optional<ContactMedium> resultado = contactMediumBs.findById(id);
+        if (resultado.isEmpty()) {
+            return "redirect:/contacts/" + idContact + "/media";
+        }
+
+        model.addAttribute("idContact", idContact);
+        model.addAttribute("updateContactMediumDto", UpdateContactMediumDto.fromEntity(resultado.get()));
+        model.addAttribute("types", contactTypeBs.getAllTypes());
+        return "contacts/media/edit";
+    }
+
+    // Recibe el form con _method=PUT; toma el id del path para no depender del campo oculto del form
+    @PutMapping("/contacts/{idContact}/media/{id}")
+    public String update(
+            @PathVariable("idContact") Integer idContact,
+            @PathVariable("id") Integer id,
+            @ModelAttribute("updateContactMediumDto") UpdateContactMediumDto dto,
+            RedirectAttributes redirectAttributes,
+            HttpSession session
+    ) {
+        if (session.getAttribute("usuarioSesion") == null) {
+            return "redirect:/";
+        }
+
+        ContactMedium contactMedium = dto.toEntity();
+        contactMedium.setId(id);           // el id viene del path, no del form (evita manipulación)
+        contactMedium.setIdContact(idContact);  // mantiene la FK al contacto padre
+        contactMediumBs.update(contactMedium);
+
+        redirectAttributes.addFlashAttribute("message", "Medio de contacto actualizado correctamente");
+        // Redirige al listado del contacto (PRG pattern: evita reenvío del form al refrescar)
         return "redirect:/contacts/" + idContact + "/media";
     }
 }

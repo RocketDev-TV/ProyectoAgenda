@@ -18,4 +18,12 @@ public class UpdateContactMediumDto {
                 .value(value)
                 .build();
     }
+
+    public static UpdateContactMediumDto fromEntity(ContactMedium entity) {
+        UpdateContactMediumDto dto = new UpdateContactMediumDto();
+        dto.setId(entity.getId());
+        dto.setIdType(entity.getIdType());
+        dto.setValue(entity.getValue());
+        return dto;
+    }
 }
