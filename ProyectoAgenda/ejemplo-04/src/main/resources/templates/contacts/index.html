@@ -25,7 +25,10 @@
         <td th:text="${contact.lastName}">Pérez</td>
         <td th:text="${contact.secondLastName}">Gómez</td>
         <td th:text="${contact.nickname}">juanpg</td>
-        <td><a th:href="@{/contacts/{id}/edit(id=${contact.id})}">Editar</a><a th:href="@{/contacts/{id}/destroy(id=${contact.id})}">Eliminar</a></td>
+        <td><a th:href="@{/contacts/{id}/edit(id=${contact.id})}">Editar</a>
+            <a th:href="@{/contacts/{id}/destroy(id=${contact.id})}">Eliminar</a>
+            <a th:href="@{/contacts/{id}/media(id=${contact.id})}" >Medios</a>
+        </td>
     </tr>
     </tbody>
 </table>

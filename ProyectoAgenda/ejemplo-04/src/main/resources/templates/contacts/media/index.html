@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Medios de Contacto</title>
+</head>
+<body>
+<div>
+    <h2>Gestión de Medios de Contacto</h2>
+
+    <div th:if="${message}">
+        <p th:text="${message}"></p>
+    </div>
+
+    <div>
+        <a th:href="@{/contacts/{id}/media/create(id=${idContact})}">Agregar Nuevo Medio</a>
+        <a th:href="@{/contacts}">Regresar a Contactos</a>
+    </div>
+    <br>
+    <table border="1">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tipo de Medio</th>
+            <th>Valor / Enlace</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:if="${#lists.isEmpty(mediaList)}">
+            <td colspan="4">Este contacto aún no tiene medios registrados.</td>
+        </tr>
+
+        <tr th:each="media : ${mediaList}">
+            <td th:text="${media.id}"></td>
+            <td th:text="${media.idType == 1 ? 'Correo Electrónico' : (media.idType == 2 ? 'Número Telefónico' : 'Instagram')}"></td>
+            <td th:text="${media.value}"></td>
+            <td>
+                <form th:action="@{/contacts/{idContact}/media/{id}(idContact=${idContact}, id=${media.id})}" method="POST" style="display:inline;">
+                    <input type="hidden" name="_method" value="delete" />
+                    <button type="submit" onclick="return confirm('¿Seguro que deseas eliminar este medio?')">
+                        Eliminar
+                    </button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Medio de Contacto</title>
+</head>
+<body>
+<div>
+    <h2>Nuevo Medio de Contacto</h2>
+
+    <form th:action="@{/contacts/{id}/media(id=${idContact})}" th:object="${registerContactMediumDto}" method="POST">
+
+        <div>
+            <label for="type">Tipo de Medio:</label>
+            <select id="type" th:field="*{idType}" required>
+                <option value="" disabled selected>-- Seleccione una opción --</option>
+                <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.name}"></option>
+            </select>
+        </div>
+        <br>
+        <div>
+            <label for="value">Valor / Cuenta / Teléfono:</label>
+            <input type="text" id="value" th:field="*{value}" placeholder="Ej: @mi_usuario o correo@correo.com" required />
+        </div>
+        <br>
+        <div>
+            <button type="submit">Guardar Medio</button>
+            <a th:href="@{/contacts/{id}/media(id=${idContact})}">Cancelar</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>
