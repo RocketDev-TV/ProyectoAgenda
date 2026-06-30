@@ -3,7 +3,7 @@ package mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.NoArgsConstructor; 
+import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.Contact;
 
@@ -18,7 +18,7 @@ public class ContactDto {
     private String name;
     private String lastName;
     private String secondLastName;
-    private String nickName;
+    private String nickname;
 
     public static ContactDto fromEntity(Contact entity) {
         return ContactDto.builder()
@@ -27,7 +27,7 @@ public class ContactDto {
                 .name(entity.getName())
                 .lastName(entity.getLastName())
                 .secondLastName(entity.getSecondLastName())
-                .nickName(entity.getNickName())
+                .nickname(entity.getNickname())
                 .build();
     }
 
@@ -38,7 +38,7 @@ public class ContactDto {
                 .name(name)
                 .lastName(lastName)
                 .secondLastName(secondLastName)
-                .nickName(nickName)
+                .nickname(nickname)
                 .build();
     }
 }

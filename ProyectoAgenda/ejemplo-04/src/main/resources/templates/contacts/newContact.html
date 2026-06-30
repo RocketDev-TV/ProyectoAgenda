@@ -27,8 +27,8 @@
     </div>
     <div>
         <label>Apodo:</label>
-        <input type="text" th:field="*{nickName}" />
-        <p th:if="${#fields.hasErrors('nickName')}" th:errors="*{nickName}" style="color:red;"></p>
+        <input type="text" th:field="*{nickname}" />
+        <p th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" style="color:red;"></p>
     </div>
     <br>
     <button type="submit">Guardar contacto</button>

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class ContactsDao {
@@ -30,13 +31,20 @@ public class ContactsDao {
     }
 
     public Contact save(Contact contact) {
-        // Traduce la entidad limpia a JPA para la base de datos
         ContactJpa contactJpa = ContactJpa.fromEntity(contact);
-
-        // Guarda en la base de datos
         var contactSavedJpa = contactJpaRepository.save(contactJpa);
-
-        // Retorna el resultado traducido de vuelta a la capa de negocio
         return contactSavedJpa.toEntity();
+    }
+
+    public Optional<Contact> findById(Integer id) {
+        return contactJpaRepository.findById(id).map(ContactJpa::toEntity);
+    }
+
+    public void deleteById(Integer id) {
+        contactJpaRepository.deleteById(id);
+    }
+
+    public void delete(Contact contact) {
+        contactJpaRepository.delete(ContactJpa.fromEntity(contact));
     }
 }

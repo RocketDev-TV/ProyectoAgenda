@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
 public class ContactsBs {
 
     @Autowired
-    ContactsDao contactsDao; // 2. Tipo y variable consistentes
+    private  ContactsDao contactsDao; // 2. Tipo y variable consistentes
 
     @Transactional(rollbackOn = Exception.class)
     public void create(Contact contact, Integer idUsuarioLogueado) {
@@ -30,5 +31,30 @@ public class ContactsBs {
     public List<Contact> getContacts(Integer idUser) {
         // 4. Usamos la variable exacta
         return contactsDao.findAll(idUser);
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public void update(Contact contact) {
+        contactsDao.save(contact);
+    }
+
+
+
+    public Contact findById(Integer id) {
+        // Retorna el contacto si existe, o null/excepción si no lo encuentra
+        return contactsDao.findById(id).orElse(null);
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public boolean delete(Integer idContacto) {
+        // Buscamos el contacto primero
+        Optional<Contact> contactResult = contactsDao.findById(idContacto);
+
+         if(contactResult.isPresent()){
+            contactsDao.delete(contactResult.get());
+            return true;
+        }
+
+        return false;
     }
 }

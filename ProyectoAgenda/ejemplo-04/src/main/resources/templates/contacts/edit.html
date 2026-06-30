@@ -9,7 +9,7 @@
 
 <!-- Thymeleaf reemplaza este texto con el valor de la variable 'mensaje' -->
 
-<form th:action="@{/users/{id}(id=${id})}" th:object="${userDto}" method="POST" th:method="PUT">
+<form th:action="@{/contacts/{id}(id=${id})}" th:object="${contactDto}" method="POST" th:method="PUT">
     <div>
         <label>Nombre:</label>
         <input type="text" th:field="*{name}" />
@@ -26,13 +26,13 @@
         <p th:if="${#fields.hasErrors('secondLastName')}" th:errors="*{secondLastName}" style="color:red;"></p>
     </div>
     <div>
-        <label>Usuario:</label>
-        <input type="text" th:field="*{username}" />
-        <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red;"></p>
+        <label>Apodo:</label>
+        <input type="text" th:field="*{nickname}" />
+        <p th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" style="color:red;"></p>
     </div>
     <br>
     <button type="submit">Enviar</button>
 </form>
-<a th:href="@{/users}">Regresar</a>
+<a th:href="@{/contacts}">Regresar</a>
 </body>
 </html>

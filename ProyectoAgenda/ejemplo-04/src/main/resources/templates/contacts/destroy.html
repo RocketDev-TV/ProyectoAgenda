@@ -9,7 +9,7 @@
 
 <!-- Thymeleaf reemplaza este texto con el valor de la variable 'mensaje' -->
 
-<form th:action="@{/users/{id}(id=${id})}" th:object="${userDto}" method="POST" th:method="DELETE">
+<form th:action="@{/contacts/{id}(id=${id})}" th:object="${contactDto}" method="POST" th:method="DELETE">
     <div>
         <label>Nombre:</label>
         <span th:text="*{name}" />
@@ -23,12 +23,12 @@
         <span th:text="*{secondLastName}" />
     </div>
     <div>
-        <label>Usuario:</label>
-        <span th:text="*{username}" />
+        <label>Apodo:</label>
+        <span th:text="*{nickname}" />
     </div>
     <br>
-    <button type="submit">Enviar</button>
+    <button type="submit">Eliminar</button>
 </form>
-<a th:href="@{/users}">Regresar</a>
+<a th:href="@{/contacts}">Regresar</a>
 </body>
 </html>

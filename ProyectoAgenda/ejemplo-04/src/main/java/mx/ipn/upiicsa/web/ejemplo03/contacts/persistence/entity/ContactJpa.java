@@ -27,7 +27,7 @@ public class ContactJpa {
     @Column(name = "tx_segundo_apellido")
     private String secondLastName;
     @Column(name = "tx_apodo")
-    private String nickName;
+    private String nickname;
     @ManyToOne
     @JoinColumn(name = "fk_id_usuario", referencedColumnName = "id_usuario", insertable = false, updatable = false)
     private UserJpa user;
@@ -39,7 +39,7 @@ public class ContactJpa {
                 .name(entity.getName())
                 .lastName(entity.getLastName())
                 .secondLastName(entity.getSecondLastName())
-                .nickName(entity.getNickName())
+                .nickname(entity.getNickname())
                 .build();
     }
 
@@ -50,7 +50,7 @@ public class ContactJpa {
                 .name(name)
                 .lastName(lastName)
                 .secondLastName(secondLastName)
-                .nickName(nickName)
+                .nickname(nickname)
                 .build();
     }
 }

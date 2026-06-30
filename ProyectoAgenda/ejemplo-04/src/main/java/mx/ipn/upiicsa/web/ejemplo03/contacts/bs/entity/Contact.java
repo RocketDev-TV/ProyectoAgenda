@@ -13,5 +13,5 @@ public class Contact {
     private String name;
     private String lastName;
     private String secondLastName;
-    private String nickName;
+    private String nickname;
 }

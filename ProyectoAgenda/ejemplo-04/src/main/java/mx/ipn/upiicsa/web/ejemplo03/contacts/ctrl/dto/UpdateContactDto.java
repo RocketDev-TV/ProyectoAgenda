@@ -8,14 +8,12 @@ import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.Contact;
 @AllArgsConstructor
 @Setter
 @Getter
-public class RegisterContactDto {
-    // Solo los datos que el usuario ingresa en la pantalla de registro
+public class UpdateContactDto {
     private String name;
     private String lastName;
     private String secondLastName;
     private String nickname;
 
-    // Método para transformar directo a Entidad de Negocio
     public Contact toEntity() {
         return Contact.builder()
                 .name(name)
@@ -24,4 +22,15 @@ public class RegisterContactDto {
                 .nickname(nickname)
                 .build();
     }
+
+    public static UpdateContactDto fromEntity(Contact entity) {
+        return UpdateContactDto.builder()
+                .name(entity.getName())
+                .lastName(entity.getLastName())
+                .secondLastName(entity.getSecondLastName())
+                .nickname(entity.getNickname())
+                .build();
+    }
 }
+
+//todo es de user por el momento
