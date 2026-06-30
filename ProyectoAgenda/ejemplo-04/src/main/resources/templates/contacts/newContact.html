@@ -5,11 +5,11 @@
     <title>Inicio - Mi Proyecto MVC</title>
 </head>
 <body>
-<h1>Registro de nuevo user</h1>
+<h1>Registro de nuevo contacto</h1>
 
 <!-- Thymeleaf reemplaza este texto con el valor de la variable 'mensaje' -->
 
-<form th:action="@{/register}" th:object="${registerUserDto}" method="POST">
+<form th:action="@{/contacts}" th:object="${registerContactDto}" method="POST">
     <div>
         <label>Nombre:</label>
         <input type="text" th:field="*{name}" />
@@ -26,18 +26,13 @@
         <p th:if="${#fields.hasErrors('secondLastName')}" th:errors="*{secondLastName}" style="color:red;"></p>
     </div>
     <div>
-        <label>Usuario:</label>
-        <input type="text" th:field="*{username}" />
-        <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red;"></p>
-    </div>
-    <div>
-        <label>Contraseña:</label>
-        <input type="password" th:field="*{password}" />
-        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red;"></p>
+        <label>Apodo:</label>
+        <input type="text" th:field="*{nickName}" />
+        <p th:if="${#fields.hasErrors('nickName')}" th:errors="*{nickName}" style="color:red;"></p>
     </div>
     <br>
-    <button type="submit">Enviar</button>
+    <button type="submit">Guardar contacto</button>
 </form>
-<a th:href="@{/users}">Cancelar</a>
+<a th:href="@{/contacts}">Cancelar</a>
 </body>
 </html>

@@ -26,7 +26,7 @@ public class UserDao {
     //private static final String QUERY_DELETE_BY_ID = "delete from usuario where id_usuario = :id";
 
     private static final String QUERY_FIND_ALL = "select * from tag01_usuario";
-    private static final String QUERY_DELETE_BY_ID = "delete from usuario where id_usuario = :id";
+    private static final String QUERY_DELETE_BY_ID = "delete from tag01_usuario where id_usuario = :id";
 
     public User save(User user) {
         log.info("Usuario DAO: {}",user.getPassword());

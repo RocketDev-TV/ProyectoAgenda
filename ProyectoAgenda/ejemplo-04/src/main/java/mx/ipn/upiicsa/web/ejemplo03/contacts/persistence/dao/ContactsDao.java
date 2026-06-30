@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class ContacsDao {
+public class ContactsDao {
     @Autowired
     ContactJpaRepository contactJpaRepository;
     @Autowired
@@ -27,5 +27,16 @@ public class ContacsDao {
                     .toList();
         }
         return contacts;
+    }
+
+    public Contact save(Contact contact) {
+        // Traduce la entidad limpia a JPA para la base de datos
+        ContactJpa contactJpa = ContactJpa.fromEntity(contact);
+
+        // Guarda en la base de datos
+        var contactSavedJpa = contactJpaRepository.save(contactJpa);
+
+        // Retorna el resultado traducido de vuelta a la capa de negocio
+        return contactSavedJpa.toEntity();
     }
 }
