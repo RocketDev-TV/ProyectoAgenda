@@ -137,6 +137,11 @@ src/
                       ContactTypeJpaRepository.java
                 App.java
     resources/
+      static/
+        css/
+          style.css
+        js/
+          main.js
       templates/
         contacts/
           media/
@@ -772,7 +777,10 @@ public class UserBs {
             userSaved.setLastName(user.getLastName());
             userSaved.setSecondLastName(user.getSecondLastName());
             userSaved.setUsername(user.getUsername());
-            log.info("Usuario BS: {}",userSaved.getPassword());
+            if (user.getPassword() != null && !user.getPassword().isBlank()) {
+                userSaved.setPassword(user.getPassword());
+            }
+            log.info("Usuario BS actualizado: {}", userSaved.getUsername());
             userDao.save(userSaved);
             return true;
         }
@@ -865,6 +873,7 @@ public class UpdateUserDto {
     private String lastName;
     private String secondLastName;
     private String username;
+    private String password;
 
     public User toEntity() {
         return User.builder()
@@ -872,6 +881,7 @@ public class UpdateUserDto {
                 .lastName(lastName)
                 .secondLastName(secondLastName)
                 .username(username)
+                .password(password)
                 .build();
     }
 
@@ -881,6 +891,7 @@ public class UpdateUserDto {
                 .lastName(entity.getLastName())
                 .secondLastName(entity.getSecondLastName())
                 .username(entity.getUsername())
+                // password no se pre-carga en el formulario por seguridad
                 .build();
     }
 }
@@ -1444,10 +1455,9 @@ public class RegisterContactMediumDto {
     private Integer idType;
 
     @NotBlank(message = "El valor no puede estar vacío.")
-    // Esta expresión regular permite tanto correos válidos como números telefónicos de 10 dígitos
     @Pattern(
-            regexp = "^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}|[0-9]{10})$",
-            message = "El formato introducido no corresponde a un correo válido o un teléfono de 10 dígitos."
+            regexp = "^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}|[0-9]{10}|@?[a-zA-Z0-9._-]{1,50})$",
+            message = "Ingresa un correo, teléfono de 10 dígitos o usuario de red social (ej. @usuario)."
     )
     private String value;
 
@@ -1463,6 +1473,8 @@ public class RegisterContactMediumDto {
 <file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/medio/ctrl/dto/UpdateContactMediumDto.java">
 package mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.ContactMedium;
@@ -1472,6 +1484,12 @@ import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.ContactMedium;
 public class UpdateContactMediumDto {
     private Integer id;
     private Integer idType;
+
+    @NotBlank(message = "El valor no puede estar vacío.")
+    @Pattern(
+            regexp = "^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}|[0-9]{10}|@?[a-zA-Z0-9._-]{1,50})$",
+            message = "Ingresa un correo, teléfono de 10 dígitos o usuario de red social (ej. @usuario)."
+    )
     private String value;
 
     public ContactMedium toEntity() {
@@ -1970,6 +1988,125 @@ public class App {
 }
 </file>
 
+<file path="src/main/resources/static/css/style.css">
+:root {
+    --brand-color: #4f46e5;
+    --brand-hover: #4338ca;
+    --bg-color: #f8fafc;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: #1e293b;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar Glassmorphism */
+.navbar-premium {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.navbar-brand { font-weight: 700; color: var(--brand-color) !important; }
+.nav-link { font-weight: 500; color: #64748b !important; transition: all 0.3s; }
+.nav-link:hover { color: var(--brand-color) !important; transform: translateY(-1px); }
+
+/* Tarjetas flotantes */
+.card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    transition: transform 0.2s;
+}
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid #f1f5f9;
+    border-radius: 16px 16px 0 0 !important;
+    padding: 1.5rem;
+}
+
+/* Botones Pro */
+.btn-brand {
+    background-color: var(--brand-color);
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    transition: all 0.3s;
+}
+.btn-brand:hover { background-color: var(--brand-hover); color: white; transform: scale(1.02); }
+
+/* Inputs limpios */
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    padding: 0.6rem 1rem;
+}
+.form-control:focus {
+    border-color: var(--brand-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+main { flex: 1; }
+
+/* Utilidades de color de marca */
+.text-brand { color: var(--brand-color) !important; }
+.bg-brand   { background-color: var(--brand-color) !important; color: white; }
+
+/* Avatar circular con inicial */
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+}
+</file>
+
+<file path="src/main/resources/static/js/main.js">
+document.addEventListener('DOMContentLoaded', function () {
+
+    // --- SweetAlert2: lee flash-attributes desde el elemento hidden del layout ---
+    const flashEl = document.getElementById('flash-data');
+    if (flashEl && typeof Swal !== 'undefined') {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true
+        });
+        const exito = flashEl.dataset.exito || null;
+        const info  = flashEl.dataset.info  || null;
+        const error = flashEl.dataset.error || null;
+
+        if (exito) Toast.fire({ icon: 'success', title: exito });
+        if (info)  Toast.fire({ icon: 'success', title: info });
+        if (error) Toast.fire({ icon: 'error',   title: error });
+    }
+
+    // --- Ojito: toggle show/hide password (funciona en registro y edición) ---
+    const toggleBtn   = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    if (toggleBtn && passwordInput) {
+        toggleBtn.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
+    }
+});
+</file>
+
 <file path="src/main/resources/templates/contacts/media/create.html">
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
@@ -2438,7 +2575,7 @@ public class App {
                             <button type="submit" class="btn btn-brand px-4">
                                 <i class="bi bi-floppy me-2"></i>Guardar Cambios
                             </button>
-                            <a th:href="@{/contacts}" class="btn btn-outline-secondary">
+                            <a th:href="@{/welcome}" class="btn btn-outline-secondary">
                                 <i class="bi bi-x-lg me-1"></i>Cancelar
                             </a>
                         </div>
@@ -2571,17 +2708,19 @@ public class App {
             var formId = this.getAttribute('data-form');
             var name   = this.getAttribute('data-name');
             Swal.fire({
-                title: '¿Eliminar contacto?',
-                html: 'Se eliminará a <strong>' + name + '</strong> y todos sus medios de contacto.',
+                title: '¿Eliminar usuario?',
+                html: 'Se eliminará la cuenta de <strong>@' + username + '</strong>. Esta acción no se puede deshacer.',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: '<i class="bi bi-trash3 me-1"></i>Sí, eliminar',
+                buttonsStyling: false, /* Apagamos los estilos feos por defecto */
+                customClass: {
+                    popup: 'rounded-4 shadow-lg border-0',
+                    confirmButton: 'btn btn-danger px-4 py-2 me-2 fw-semibold',
+                    cancelButton: 'btn btn-light border px-4 py-2 fw-semibold text-dark'
+                },
+                confirmButtonText: '<i class="bi bi-trash3 me-2"></i>Sí, eliminar',
                 cancelButtonText: 'Cancelar',
-                reverseButtons: true,
-                customClass: { popup: 'rounded-3', confirmButton: 'btn btn-sm', cancelButton: 'btn btn-sm btn-secondary' },
-                buttonsStyling: false
+                reverseButtons: true
             }).then(function(r) {
                 if (r.isConfirmed) document.getElementById(formId).submit();
             });
@@ -2705,250 +2844,45 @@ public class App {
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
 
-<!--
-  ╔══════════════════════════════════════════════════════════════╗
-  ║  FRAGMENT: head(pageTitle)                                   ║
-  ║  Uso: <head th:replace="~{fragments/layout :: head('Título')}">  ║
-  ║  Incluye: Bootstrap 5 CSS · Bootstrap Icons · SweetAlert2   ║
-  ╚══════════════════════════════════════════════════════════════╝
--->
+<!-- HEAD MAESTRO -->
 <head th:fragment="head(pageTitle)">
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title th:text="${pageTitle} + ' — Agenda Web'">Agenda Web</title>
+    <title th:text="${pageTitle} + ' — Agenda Premium'">Agenda Web</title>
 
-    <!-- ① Bootstrap 5.3 CSS -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
-
-    <!-- ② Bootstrap Icons 1.11 -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
-
-    <!-- ③ SweetAlert2 — va en <head> para estar disponible en scripts de confirmación -->
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-
-    <!-- ④ Estilos personalizados -->
-    <style>
-        /* ── Variables ─────────────────────────────── */
-        :root {
-            --brand:        #2563eb;   /* Blue-600  */
-            --brand-dark:   #1d4ed8;   /* Blue-700  */
-            --brand-light:  #dbeafe;   /* Blue-100  */
-            --surface:      #f8fafc;   /* Slate-50  */
-            --card-shadow:  0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(37,99,235,.06);
-            --nav-bg:       #0f172a;   /* Slate-900 */
-            --text:         #0f172a;
-            --muted:        #64748b;
-        }
-
-        /* ── Base ───────────────────────────────────── */
-        body {
-            background-color: var(--surface);
-            color: var(--text);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        main { flex: 1; }
-
-        /* ── Navbar ─────────────────────────────────── */
-        .app-navbar {
-            background-color: var(--nav-bg);
-            border-bottom: 1px solid rgba(255,255,255,.06);
-        }
-        .app-navbar .navbar-brand {
-            font-weight: 700;
-            font-size: 1.15rem;
-            letter-spacing: -.3px;
-            color: #fff !important;
-        }
-        .app-navbar .nav-link {
-            color: rgba(255,255,255,.65) !important;
-            font-size: .875rem;
-            font-weight: 500;
-            padding: .5rem .75rem;
-            border-radius: 6px;
-            transition: color .15s, background .15s;
-        }
-        .app-navbar .nav-link:hover,
-        .app-navbar .nav-link.active {
-            color: #fff !important;
-            background-color: rgba(255,255,255,.08);
-        }
-        .app-navbar .nav-divider {
-            width: 1px; height: 20px;
-            background: rgba(255,255,255,.15);
-            align-self: center;
-        }
-
-        /* ── Cards ──────────────────────────────────── */
-        .card {
-            border: 1px solid rgba(0,0,0,.06);
-            border-radius: 12px;
-            box-shadow: var(--card-shadow);
-        }
-        .card-header {
-            background-color: var(--brand) !important;
-            color: #fff;
-            border-radius: 11px 11px 0 0 !important;
-            border-bottom: none;
-            padding: 1rem 1.25rem;
-        }
-        .card-header h5, .card-header h6 { margin-bottom: 0; font-weight: 600; }
-
-        /* ── Buttons ─────────────────────────────────── */
-        .btn { border-radius: 8px; font-weight: 500; }
-        .btn-brand {
-            background-color: var(--brand);
-            border-color: var(--brand);
-            color: #fff;
-        }
-        .btn-brand:hover, .btn-brand:focus {
-            background-color: var(--brand-dark);
-            border-color: var(--brand-dark);
-            color: #fff;
-        }
-        .btn-outline-brand {
-            border-color: var(--brand);
-            color: var(--brand);
-        }
-        .btn-outline-brand:hover {
-            background-color: var(--brand);
-            color: #fff;
-        }
-
-        /* ── Tables ──────────────────────────────────── */
-        .table thead th {
-            font-size: .75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .07em;
-            color: var(--muted);
-            background-color: #f8fafc;
-            border-bottom: 1px solid #e2e8f0;
-            padding: .875rem 1rem;
-        }
-        .table tbody td {
-            vertical-align: middle;
-            padding: .875rem 1rem;
-            border-color: #f1f5f9;
-        }
-        .table-hover tbody tr:hover { background-color: #eff6ff; }
-
-        /* ── Form controls ───────────────────────────── */
-        .form-control, .form-select {
-            border-color: #e2e8f0;
-            border-radius: 8px;
-            font-size: .9rem;
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: var(--brand);
-            box-shadow: 0 0 0 3px rgba(37,99,235,.15);
-        }
-        .form-label { font-weight: 500; font-size: .875rem; margin-bottom: .375rem; }
-
-        /* ── Badges / Chips ──────────────────────────── */
-        .chip {
-            display: inline-flex; align-items: center; gap: .35rem;
-            padding: .25rem .65rem;
-            border-radius: 9999px;
-            font-size: .78rem;
-            font-weight: 500;
-        }
-        .chip-blue   { background: var(--brand-light); color: var(--brand-dark); }
-        .chip-green  { background: #dcfce7; color: #166534; }
-        .chip-red    { background: #fee2e2; color: #991b1b; }
-        .chip-purple { background: #ede9fe; color: #6d28d9; }
-        .chip-gray   { background: #f1f5f9; color: #475569; }
-
-        /* ── Footer ──────────────────────────────────── */
-        .app-footer {
-            background-color: #fff;
-            border-top: 1px solid #e2e8f0;
-            padding: .875rem 0;
-            font-size: .8rem;
-            color: var(--muted);
-            text-align: center;
-        }
-
-        /* ── Utilities ───────────────────────────────── */
-        .text-brand  { color: var(--brand) !important; }
-        .bg-brand    { background-color: var(--brand) !important; }
-        .avatar {
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: .85rem;
-        }
-        .page-header { margin-bottom: 1.75rem; }
-        .page-header h3 { font-weight: 700; margin-bottom: .2rem; }
-        .page-header p  { color: var(--muted); font-size: .875rem; margin: 0; }
-        .empty-state { padding: 3.5rem 1rem; text-align: center; color: var(--muted); }
-        .empty-state i { font-size: 2.5rem; opacity: .3; display: block; margin-bottom: .75rem; }
-    </style>
+    <!-- Estilos personalizados -->
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
 </head>
-
 <body>
 
-<!--
-  ╔══════════════════════════════════════════════════════════════╗
-  ║  FRAGMENT: navbar                                            ║
-  ║  Uso: <div th:replace="~{fragments/layout :: navbar}"></div> ║
-  ╚══════════════════════════════════════════════════════════════╝
--->
-<nav th:fragment="navbar" class="navbar navbar-expand-lg app-navbar">
+<!-- NAVBAR MAESTRO -->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-premium sticky-top py-3">
     <div class="container">
-        <!-- Brand -->
         <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/welcome}">
-            <i class="bi bi-journal-bookmark-fill" style="color:#60a5fa;"></i>
-            Agenda Web
+            <i class="bi bi-layers-half fs-4"></i> Agenda Pro
         </a>
-
-        <!-- Toggler (mobile) -->
-        <button class="navbar-toggler border-0 text-white" type="button"
-                data-bs-toggle="collapse" data-bs-target="#appNav">
-            <i class="bi bi-list fs-5"></i>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <i class="bi bi-grid-3x3-gap-fill fs-4 text-secondary"></i>
         </button>
-
-        <div class="collapse navbar-collapse" id="appNav">
-            <!-- Links -->
-            <ul class="navbar-nav me-auto gap-1 mt-2 mt-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/welcome}">
-                        <i class="bi bi-house me-1"></i>Inicio
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/contacts}">
-                        <i class="bi bi-people me-1"></i>Mis Contactos
-                    </a>
-                </li>
-                <li class="nav-item" th:if="${session.usuarioSesion != null}">
-                    <a class="nav-link"
-                       th:href="@{/users/{id}/edit(id=${session.usuarioSesion.id})}">
-                        <i class="bi bi-person-gear me-1"></i>Mi Perfil
-                    </a>
-                </li>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-4 gap-3">
+                <li class="nav-item"><a class="nav-link" th:href="@{/welcome}"><i class="bi bi-house me-1"></i>Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/contacts}"><i class="bi bi-people me-1"></i>Contactos</a></li>
             </ul>
-
-            <!-- User info + logout -->
-            <div class="d-flex align-items-center gap-3 mt-2 mt-lg-0"
-                 th:if="${session.usuarioSesion != null}">
-                <div class="nav-divider d-none d-lg-block"></div>
-                <!-- Avatar chip -->
-                <div class="d-flex align-items-center gap-2">
-                    <div class="avatar bg-brand text-white">
-                        <span th:text="${#strings.substring(session.usuarioSesion.username, 0, 1).toUpperCase()}">U</span>
-                    </div>
-                    <span class="text-white-50 small d-none d-md-inline"
-                          th:text="${session.usuarioSesion.username}">usuario</span>
+            <div class="d-flex align-items-center gap-3" th:if="${session.usuarioSesion != null}">
+                <div class="d-flex align-items-center gap-2 px-3 py-1 bg-light rounded-pill border">
+                    <i class="bi bi-person-circle text-primary fs-5"></i>
+                    <span class="fw-semibold text-secondary" th:text="${session.usuarioSesion.username}">User</span>
                 </div>
-                <!-- Logout -->
-                <a th:href="@{/logout}"
-                   class="btn btn-sm px-3 text-white border-white-25"
-                   style="border: 1px solid rgba(255,255,255,.25); border-radius:8px; font-size:.8rem;">
+                <a th:href="@{/logout}" class="btn btn-outline-danger btn-sm rounded-pill px-3">
                     <i class="bi bi-box-arrow-right me-1"></i>Salir
                 </a>
             </div>
@@ -2956,60 +2890,21 @@ public class App {
     </div>
 </nav>
 
-<!--
-  ╔══════════════════════════════════════════════════════════════╗
-  ║  FRAGMENT: footer                                            ║
-  ║  Uso: <div th:replace="~{fragments/layout :: footer}"></div> ║
-  ╚══════════════════════════════════════════════════════════════╝
--->
-<footer th:fragment="footer" class="app-footer">
+<!-- FOOTER MAESTRO -->
+<footer th:fragment="footer" class="bg-white border-top py-4 mt-5 text-center text-muted small">
     <div class="container">
-        <i class="bi bi-journal-bookmark-fill me-1 text-brand"></i>
-        Agenda Web &copy; 2024 &mdash; IPN UPIICSA
+        <p class="mb-0">© 2026 Agenda IPN - UPIICSA.</p>
     </div>
 </footer>
 
-<!--
-  ╔══════════════════════════════════════════════════════════════════════╗
-  ║  FRAGMENT: scripts                                                   ║
-  ║  Uso: <th:block th:replace="~{fragments/layout :: scripts}">        ║
-  ║  Incluye: Bootstrap 5 JS + Toast automático de Flash Attributes     ║
-  ╚══════════════════════════════════════════════════════════════════════╝
--->
+<!-- SCRIPTS MAESTROS -->
 <th:block th:fragment="scripts">
-    <!-- Bootstrap 5 JS Bundle -->
+    <!-- Puente Thymeleaf → JS: pasa flash-attributes como data-attributes (Thymeleaf NO procesa .js externos) -->
+    <span id="flash-data"
+          th:attr="data-exito=${messageConfirmacion},data-info=${message},data-error=${messageError}"
+          hidden></span>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!--
-        Toast automático de Flash Attributes.
-        th:inline="javascript" permite leer variables del modelo de Spring directamente.
-        Thymeleaf renderiza null cuando la variable no existe → la condición 'if' la descarta.
-    -->
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        (function () {
-            var msgSuccess = /*[[${messageConfirmacion}]]*/ null;
-            var msgInfo    = /*[[${message}]]*/ null;
-            var msgError   = /*[[${messageError}]]*/ null;
-
-            function swalToast(icon, title) {
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: icon,
-                    title: title,
-                    showConfirmButton: false,
-                    timer: 3800,
-                    timerProgressBar: true
-                });
-            }
-
-            if (msgSuccess) swalToast('success', msgSuccess);
-            if (msgInfo)    swalToast('success', msgInfo);
-            if (msgError)   swalToast('error', msgError);
-        })();
-        /*]]>*/
-    </script>
+    <script th:src="@{/js/main.js}"></script>
 </th:block>
 
 </body>
@@ -3020,116 +2915,85 @@ public class App {
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
 
-<head th:replace="~{fragments/layout :: head('Crear Cuenta')}">
-</head>
+<head th:replace="~{fragments/layout :: head('Crear Cuenta')}"></head>
 
-<body style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1e40af 100%); min-height:100vh;">
+<!-- Fondo cambiado para que haga match con el Login -->
+<body style="background: linear-gradient(135deg, #f6f8fd 0%, #f1f5f9 100%); min-height:100vh;">
 
-<div class="d-flex align-items-center justify-content-center min-vh-100 py-5 px-3">
+<div class="container d-flex align-items-center justify-content-center min-vh-100 py-5 px-3">
     <div style="width:100%; max-width:500px;">
 
-        <!-- Brand -->
-        <div class="text-center mb-4">
-            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white mb-3"
-                 style="width:64px; height:64px; box-shadow: 0 8px 24px rgba(0,0,0,.3);">
-                <i class="bi bi-person-plus-fill fs-3 text-brand"></i>
+        <!-- Card sin el header suelto, todo encapsulado -->
+        <div class="card p-4 p-sm-5 border-0 shadow-lg" style="border-radius: 24px;">
+            
+            <div class="text-center mb-4">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                    <i class="bi bi-person-plus-fill fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Crear Cuenta</h4>
+                <p class="text-muted small">Todos los campos marcados con * son obligatorios</p>
             </div>
-            <h1 class="text-white fw-bold fs-3 mb-1">Crear Cuenta</h1>
-            <p class="text-white-50 small mb-0">Completa el formulario para registrarte</p>
-        </div>
-
-        <!-- Card -->
-        <div class="card p-4 p-sm-5">
-            <h5 class="fw-bold mb-1">Datos de Registro</h5>
-            <p class="text-muted small mb-4">Todos los campos marcados con * son obligatorios</p>
 
             <form th:action="@{/register}" th:object="${registerUserDto}" method="POST">
 
                 <!-- Nombre -->
                 <div class="mb-3">
-                    <label for="name" class="form-label">
+                    <label for="name" class="form-label text-muted small fw-semibold">
                         <i class="bi bi-person text-brand me-1"></i>Nombre *
                     </label>
-                    <input type="text" id="name"
-                           th:field="*{name}"
-                           class="form-control"
-                           th:classappend="${#fields.hasErrors('name')} ? ' is-invalid'"
-                           placeholder="ej. María"/>
-                    <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}"
-                         th:errors="*{name}"></div>
+                    <input type="text" id="name" th:field="*{name}" class="form-control bg-light" th:classappend="${#fields.hasErrors('name')} ? ' is-invalid'" placeholder="ej. María"/>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                 </div>
 
                 <!-- Apellidos -->
                 <div class="row g-3 mb-3">
                     <div class="col-sm-6">
-                        <label for="lastName" class="form-label">Primer Apellido *</label>
-                        <input type="text" id="lastName"
-                               th:field="*{lastName}"
-                               class="form-control"
-                               th:classappend="${#fields.hasErrors('lastName')} ? ' is-invalid'"
-                               placeholder="ej. García"/>
-                        <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}"
-                             th:errors="*{lastName}"></div>
+                        <label for="lastName" class="form-label text-muted small fw-semibold">1er Apellido *</label>
+                        <input type="text" id="lastName" th:field="*{lastName}" class="form-control bg-light" th:classappend="${#fields.hasErrors('lastName')} ? ' is-invalid'" placeholder="ej. García"/>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
                     </div>
                     <div class="col-sm-6">
-                        <label for="secondLastName" class="form-label">
-                            Segundo Apellido <span class="text-muted fw-normal">(opcional)</span>
-                        </label>
-                        <input type="text" id="secondLastName"
-                               th:field="*{secondLastName}"
-                               class="form-control"
-                               placeholder="ej. López"/>
+                        <!-- Texto acortado para que no se desborde -->
+                        <label for="secondLastName" class="form-label text-muted small fw-semibold">2do Apellido <span class="fw-normal">(opcional)</span></label>
+                        <input type="text" id="secondLastName" th:field="*{secondLastName}" class="form-control bg-light" placeholder="ej. López"/>
                     </div>
                 </div>
 
-                <hr class="my-4"/>
+                <hr class="my-4 border-light"/>
 
                 <!-- Username -->
                 <div class="mb-3">
-                    <label for="username" class="form-label">
+                    <label for="username" class="form-label text-muted small fw-semibold">
                         <i class="bi bi-at text-brand me-1"></i>Nombre de Usuario *
                     </label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted">
-                            <i class="bi bi-at"></i>
-                        </span>
-                        <input type="text" id="username"
-                               th:field="*{username}"
-                               class="form-control border-start-0"
-                               th:classappend="${#fields.hasErrors('username')} ? ' is-invalid'"
-                               placeholder="mi_usuario"
-                               autocomplete="username"/>
-                        <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}"
-                             th:errors="*{username}"></div>
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-at"></i></span>
+                        <input type="text" id="username" th:field="*{username}" class="form-control bg-light border-start-0" th:classappend="${#fields.hasErrors('username')} ? ' is-invalid'" placeholder="mi_usuario" autocomplete="username"/>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
                     </div>
                 </div>
 
                 <!-- Password -->
                 <div class="mb-4">
-                    <label for="password" class="form-label">
+                    <label for="password" class="form-label text-muted small fw-semibold">
                         <i class="bi bi-shield-lock text-brand me-1"></i>Contraseña *
                     </label>
-                    <input type="password" id="password"
-                           th:field="*{password}"
-                           class="form-control"
-                           th:classappend="${#fields.hasErrors('password')} ? ' is-invalid'"
-                           placeholder="Mínimo 6 caracteres"
-                           autocomplete="new-password"/>
-                    <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}"
-                         th:errors="*{password}"></div>
+                    <!-- Wrapper relativo para el ojito -->
+                    <div class="position-relative">
+                        <input type="password" id="password" th:field="*{password}" class="form-control bg-light" style="padding-right: 2.5rem;" th:classappend="${#fields.hasErrors('password')} ? ' is-invalid'" placeholder="Mínimo 6 caracteres" autocomplete="new-password"/>
+                        <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-secondary fs-5" id="togglePassword" style="cursor: pointer; z-index: 10;"></i>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn btn-brand w-100 py-2 fw-semibold">
+                <button type="submit" class="btn btn-brand w-100 py-3 fw-semibold shadow-sm">
                     <i class="bi bi-person-check me-2"></i>Crear Cuenta
                 </button>
             </form>
 
-            <hr class="my-4"/>
-
-            <p class="text-center text-muted small mb-0">
-                ¿Ya tienes cuenta?
-                <a th:href="@{/}" class="fw-semibold text-brand">Inicia sesión</a>
-            </p>
+            <div class="text-center mt-4">
+                <p class="text-muted small mb-0">¿Ya tienes cuenta? <a th:href="@{/}" class="text-decoration-none fw-bold text-brand">Inicia sesión</a></p>
+            </div>
         </div>
 
     </div>
@@ -3275,20 +3139,29 @@ public class App {
                             </div>
                         </div>
 
-                        <!-- Info: no se edita contraseña -->
-                        <div class="alert alert-light border d-flex gap-2 align-items-start py-2 mb-4" role="alert">
-                            <i class="bi bi-info-circle-fill text-brand mt-1 flex-shrink-0"></i>
-                            <small class="text-muted">
-                                La contraseña no se puede modificar desde aquí.
-                                Contacta al administrador si necesitas cambiarla.
-                            </small>
+                        <!-- Contraseña (dejar vacío para no cambiarla) -->
+                        <div class="mb-4">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-shield-lock text-brand me-1"></i>Nueva Contraseña
+                                <span class="text-muted fw-normal">(opcional)</span>
+                            </label>
+                            <div class="position-relative">
+                                <input type="password" id="password"
+                                       th:field="*{password}"
+                                       class="form-control"
+                                       style="padding-right: 2.5rem;"
+                                       placeholder="Dejar vacío para no cambiarla"
+                                       autocomplete="new-password"/>
+                                <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-secondary fs-5"
+                                   id="togglePassword" style="cursor: pointer; z-index: 10;"></i>
+                            </div>
                         </div>
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-brand px-4">
                                 <i class="bi bi-floppy me-2"></i>Guardar Cambios
                             </button>
-                            <a th:href="@{/users}" class="btn btn-outline-secondary">
+                            <a th:href="@{/welcome}" class="btn btn-outline-secondary">
                                 <i class="bi bi-x-lg me-1"></i>Cancelar
                             </a>
                         </div>
@@ -3445,80 +3318,70 @@ public class App {
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
 
-<head th:replace="~{fragments/layout :: head('Iniciar Sesión')}">
-    <!-- Bootstrap, Icons y SweetAlert2 se cargan desde el fragmento -->
-</head>
+<head th:replace="~{fragments/layout :: head('Iniciar Sesión')}"></head>
 
-<body style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1e40af 100%); min-height:100vh;">
+<body style="background: linear-gradient(135deg, #f6f8fd 0%, #f1f5f9 100%); min-height: 100vh;">
 
-<div class="d-flex align-items-center justify-content-center min-vh-100 py-5 px-3">
-    <div style="width:100%; max-width:420px;">
-
-        <!-- Logo / Brand -->
+<div class="container d-flex align-items-center justify-content-center min-vh-100 py-5 px-3">
+    <div class="card p-4 p-sm-5 border-0 shadow-lg" style="max-width: 420px; width: 100%; border-radius: 24px;">
+        
         <div class="text-center mb-4">
-            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white mb-3"
-                 style="width:64px; height:64px; box-shadow: 0 8px 24px rgba(0,0,0,.3);">
-                <i class="bi bi-journal-bookmark-fill fs-3 text-brand"></i>
+            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                <!-- Cambiado el fingerprint por el person-circle -->
+                <i class="bi bi-person-circle fs-1"></i>
             </div>
-            <h1 class="text-white fw-bold fs-3 mb-1">Agenda Web</h1>
-            <p class="text-white-50 small mb-0">IPN · UPIICSA · Desarrollo Web</p>
+            <h4 class="fw-bold text-dark">Bienvenido de nuevo</h4>
+            <p class="text-muted small">Ingresa tus credenciales para continuar</p>
         </div>
 
-        <!-- Card login -->
-        <div class="card p-4 p-sm-5">
-            <h5 class="fw-bold mb-1">Bienvenido 👋</h5>
-            <p class="text-muted small mb-4">Ingresa tus credenciales para continuar</p>
+        <form th:action="@{/}" th:object="${usuarioDto}" method="POST">
+            
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control bg-light" id="username" th:field="*{username}" placeholder="Usuario" th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'">
+                <label for="username"><i class="bi bi-person me-2"></i>Usuario</label>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+            </div>
 
-            <form th:action="@{/}" th:object="${usuarioDto}" method="POST">
+            <!-- Contraseña con ojito usando position-relative -->
+            <div class="form-floating mb-4 position-relative">
+                <input type="password" class="form-control bg-light" id="password" th:field="*{password}" placeholder="Contraseña" style="padding-right: 2.5rem;" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'">
+                <label for="password"><i class="bi bi-shield-lock me-2"></i>Contraseña</label>
+                <!-- Botón del ojito -->
+                <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-secondary fs-5" id="togglePassword" style="cursor: pointer; z-index: 10;"></i>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+            </div>
 
-                <!-- Usuario -->
-                <div class="mb-3">
-                    <label for="username" class="form-label">
-                        <i class="bi bi-person text-brand me-1"></i>Usuario
-                    </label>
-                    <input type="text" id="username"
-                           th:field="*{username}"
-                           class="form-control form-control-lg"
-                           th:classappend="${#fields.hasErrors('username')} ? ' is-invalid'"
-                           placeholder="tu_usuario"
-                           autocomplete="username" autofocus/>
-                    <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}"
-                         th:errors="*{username}"></div>
-                </div>
+            <button type="submit" class="btn btn-brand w-100 py-3 fw-semibold shadow-sm">
+                Acceder al Sistema <i class="bi bi-arrow-right ms-2"></i>
+            </button>
+        </form>
 
-                <!-- Contraseña -->
-                <div class="mb-4">
-                    <label for="password" class="form-label">
-                        <i class="bi bi-lock text-brand me-1"></i>Contraseña
-                    </label>
-                    <input type="password" id="password"
-                           th:field="*{password}"
-                           class="form-control form-control-lg"
-                           th:classappend="${#fields.hasErrors('password')} ? ' is-invalid'"
-                           placeholder="••••••••"
-                           autocomplete="current-password"/>
-                    <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}"
-                         th:errors="*{password}"></div>
-                </div>
-
-                <button type="submit" class="btn btn-brand w-100 py-2 fw-semibold fs-6">
-                    <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
-                </button>
-            </form>
-
-            <hr class="my-4"/>
-
-            <p class="text-center text-muted small mb-0">
-                ¿No tienes cuenta?
-                <a th:href="@{/register/new}" class="fw-semibold text-brand">Regístrate aquí</a>
-            </p>
+        <div class="text-center mt-4">
+            <p class="text-muted small mb-0">¿No tienes cuenta? <a th:href="@{/register/new}" class="text-decoration-none fw-bold text-brand">Regístrate aquí</a></p>
         </div>
-
     </div>
 </div>
 
+<!-- Script para el ojito de la contraseña -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+        
+        if(togglePassword && password) {
+            togglePassword.addEventListener('click', function () {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                this.classList.toggle('bi-eye');
+                this.classList.toggle('bi-eye-slash');
+            });
+        }
+    });
+</script>
+
 <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
+<!--Hecho con ☕, código y algo de indie rock punk alternativo en la CDMX.-->
 </html>
 </file>
 
@@ -3629,6 +3492,7 @@ spring.datasource.configuration.maximum-pool-size=2
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.hibernate.ddl-auto=none
+spring.thymeleaf.cache=false
 
 spring.mvc.hiddenmethod.filter.enabled=true
 </file>
