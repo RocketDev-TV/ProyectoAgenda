@@ -1,38 +1,112 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org" lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Inicio - Mi Proyecto MVC</title>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Editar Contacto')}">
 </head>
+
 <body>
-<h1>Editar usuario</h1>
+<div th:replace="~{fragments/layout :: navbar}"></div>
 
-<!-- Thymeleaf reemplaza este texto con el valor de la variable 'mensaje' -->
+<main class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-9 col-lg-7 col-xl-6">
 
-<form th:action="@{/contacts/{id}(id=${id})}" th:object="${contactDto}" method="POST" th:method="PUT">
-    <div>
-        <label>Nombre:</label>
-        <input type="text" th:field="*{name}" />
-        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red;"></p>
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/contacts}" class="text-brand text-decoration-none">
+                            <i class="bi bi-people me-1"></i>Mis Contactos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">Editar Contacto</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-pencil-square me-2"></i>Editar Contacto</h5>
+                </div>
+                <div class="card-body p-4">
+                    <!--
+                        PUT a través del hidden _method.
+                        Spring lo intercepta via HiddenHttpMethodFilter
+                        (ya activo con spring.mvc.hiddenmethod.filter.enabled=true).
+                        El ${id} viene del controlador: model.addAttribute("id", ...)
+                    -->
+                    <form th:action="@{/contacts/{id}(id=${id})}"
+                          th:object="${contactDto}"
+                          method="POST">
+                        <input type="hidden" name="_method" value="PUT"/>
+
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">
+                                <i class="bi bi-person text-brand me-1"></i>Nombre *
+                            </label>
+                            <input type="text" id="name"
+                                   th:field="*{name}"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('name')} ? ' is-invalid'"
+                                   placeholder="ej. Ana"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}"
+                                 th:errors="*{name}"></div>
+                        </div>
+
+                        <!-- Apellidos -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label for="lastName" class="form-label">Primer Apellido *</label>
+                                <input type="text" id="lastName"
+                                       th:field="*{lastName}"
+                                       class="form-control"
+                                       th:classappend="${#fields.hasErrors('lastName')} ? ' is-invalid'"
+                                       placeholder="ej. Martínez"/>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}"
+                                     th:errors="*{lastName}"></div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="secondLastName" class="form-label">
+                                    Segundo Apellido <span class="text-muted fw-normal">(opcional)</span>
+                                </label>
+                                <input type="text" id="secondLastName"
+                                       th:field="*{secondLastName}"
+                                       class="form-control"
+                                       placeholder="ej. Ruiz"/>
+                            </div>
+                        </div>
+
+                        <!-- Apodo -->
+                        <div class="mb-4">
+                            <label for="nickname" class="form-label">
+                                <i class="bi bi-tag text-brand me-1"></i>Apodo / Nickname *
+                            </label>
+                            <input type="text" id="nickname"
+                                   th:field="*{nickname}"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('nickname')} ? ' is-invalid'"
+                                   placeholder="ej. Anita"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('nickname')}"
+                                 th:errors="*{nickname}"></div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-brand px-4">
+                                <i class="bi bi-floppy me-2"></i>Guardar Cambios
+                            </button>
+                            <a th:href="@{/welcome}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
     </div>
-    <div>
-        <label>Primer apellido:</label>
-        <input type="text" th:field="*{lastName}" />
-        <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" style="color:red;"></p>
-    </div>
-    <div>
-        <label>Segundo apellido:</label>
-        <input type="text" th:field="*{secondLastName}" />
-        <p th:if="${#fields.hasErrors('secondLastName')}" th:errors="*{secondLastName}" style="color:red;"></p>
-    </div>
-    <div>
-        <label>Apodo:</label>
-        <input type="text" th:field="*{nickname}" />
-        <p th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" style="color:red;"></p>
-    </div>
-    <br>
-    <button type="submit">Enviar</button>
-</form>
-<a th:href="@{/contacts}">Regresar</a>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

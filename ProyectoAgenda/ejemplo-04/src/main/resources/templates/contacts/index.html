@@ -1,39 +1,138 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org" lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Inicio - Mi Proyecto MVC</title>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Mis Contactos')}">
 </head>
+
 <body>
-<h1>Gestión de contactos</h1>
-<table>
-    <thead>
-    <tr>
-        <!--<th>ID</th>-->
-        <th>Nombre</th>
-        <th>Primer Apellido</th>
-        <th>Segundo Apellido</th>
-        <th>Usuario (Username)</th>
-        <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- th:each se encarga de repetir este <tr> por cada contacto en la lista -->
-    <tr th:each="contact : ${contacts}">
-        <!--<td th:text="${contacto.id}">1</td>-->
-        <td th:text="${contact.name}">Juan</td>
-        <td th:text="${contact.lastName}">Pérez</td>
-        <td th:text="${contact.secondLastName}">Gómez</td>
-        <td th:text="${contact.nickname}">juanpg</td>
-        <td><a th:href="@{/contacts/{id}/edit(id=${contact.id})}">Editar</a>
-            <a th:href="@{/contacts/{id}/destroy(id=${contact.id})}">Eliminar</a>
-            <a th:href="@{/contacts/{id}/media(id=${contact.id})}" >Medios</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<a th:href="@{/contacts/newContact}">Registrar nuevo contacto</a>
-<br>
-<a th:href="@{/welcome}">Regresar</a>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 page-header">
+        <div>
+            <h3><i class="bi bi-people-fill text-brand me-2"></i>Mis Contactos</h3>
+            <p>Gestiona tu agenda personal de contactos</p>
+        </div>
+        <a th:href="@{/contacts/newContact}" class="btn btn-brand">
+            <i class="bi bi-person-plus-fill me-2"></i>Nuevo Contacto
+        </a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th class="ps-4">Nombre completo</th>
+                        <th class="d-none d-md-table-cell">Apodo</th>
+                        <th class="text-center pe-4" style="width:200px;">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <!-- Sin contactos -->
+                    <tr th:if="${#lists.isEmpty(contacts)}">
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <i class="bi bi-people"></i>
+                                <strong class="d-block mb-1">Sin contactos aún</strong>
+                                <span class="small">Agrega tu primer contacto con el botón de arriba.</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Filas -->
+                    <tr th:each="contact : ${contacts}">
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <!-- Avatar generado con inicial -->
+                                <div class="avatar bg-brand text-white" style="width:38px;height:38px;flex-shrink:0;">
+                                    <span th:text="${#strings.substring(contact.name,0,1).toUpperCase()}">A</span>
+                                </div>
+                                <div>
+                                    <div class="fw-semibold lh-sm"
+                                         th:text="${contact.name + ' ' + contact.lastName}">Nombre</div>
+                                    <div class="text-muted small"
+                                         th:text="${contact.secondLastName ?: ''}"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="d-none d-md-table-cell">
+                            <span class="chip chip-blue" th:text="${contact.nickname}">apodo</span>
+                        </td>
+                        <td class="text-center pe-4">
+                            <div class="d-flex justify-content-center gap-2">
+                                <!-- Medios -->
+                                <a th:href="@{/contacts/{id}/media(id=${contact.id})}"
+                                   class="btn btn-sm btn-outline-brand" title="Ver medios de contacto">
+                                    <i class="bi bi-telephone-inbound"></i>
+                                </a>
+                                <!-- Editar -->
+                                <a th:href="@{/contacts/{id}/edit(id=${contact.id})}"
+                                   class="btn btn-sm btn-outline-secondary" title="Editar contacto">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <!-- Eliminar -->
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger js-delete"
+                                        th:attr="data-form='del-c-' + ${contact.id},
+                                                 data-name=${contact.name + ' ' + contact.lastName}">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                                <form th:id="'del-c-' + ${contact.id}"
+                                      th:action="@{/contacts/{id}(id=${contact.id})}"
+                                      method="POST" style="display:none;">
+                                    <input type="hidden" name="_method" value="DELETE"/>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a th:href="@{/welcome}" class="text-muted small">
+            <i class="bi bi-arrow-left me-1"></i>Volver al inicio
+        </a>
+    </div>
+</main>
+
+<!-- SweetAlert2 delete (SweetAlert2 ya está en <head> via layout) -->
+<script>
+    document.querySelectorAll('.js-delete').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var formId = this.getAttribute('data-form');
+            var name   = this.getAttribute('data-name');
+            Swal.fire({
+                title: '¿Eliminar usuario?',
+                html: 'Se eliminará la cuenta de <strong>@' + username + '</strong>. Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                buttonsStyling: false, /* Apagamos los estilos feos por defecto */
+                customClass: {
+                    popup: 'rounded-4 shadow-lg border-0',
+                    confirmButton: 'btn btn-danger px-4 py-2 me-2 fw-semibold',
+                    cancelButton: 'btn btn-light border px-4 py-2 fw-semibold text-dark'
+                },
+                confirmButtonText: '<i class="bi bi-trash3 me-2"></i>Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then(function(r) {
+                if (r.isConfirmed) document.getElementById(formId).submit();
+            });
+        });
+    });
+</script>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

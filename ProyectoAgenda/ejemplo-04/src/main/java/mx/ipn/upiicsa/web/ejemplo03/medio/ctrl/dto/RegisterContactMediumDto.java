@@ -14,10 +14,9 @@ public class RegisterContactMediumDto {
     private Integer idType;
 
     @NotBlank(message = "El valor no puede estar vacío.")
-    // Esta expresión regular permite tanto correos válidos como números telefónicos de 10 dígitos
     @Pattern(
-            regexp = "^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}|[0-9]{10})$",
-            message = "El formato introducido no corresponde a un correo válido o un teléfono de 10 dígitos."
+            regexp = "^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}|[0-9]{10}|@?[a-zA-Z0-9._-]{1,50})$",
+            message = "Ingresa un correo, teléfono de 10 dígitos o usuario de red social (ej. @usuario)."
     )
     private String value;
 

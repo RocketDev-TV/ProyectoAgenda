@@ -1,43 +1,90 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org" lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Inicio - Mi Proyecto MVC</title>
-</head>
-<body>
-<h1>Registro de nuevo user</h1>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 
-<!-- Thymeleaf reemplaza este texto con el valor de la variable 'mensaje' -->
+<head th:replace="~{fragments/layout :: head('Crear Cuenta')}"></head>
 
-<form th:action="@{/register}" th:object="${registerUserDto}" method="POST">
-    <div>
-        <label>Nombre:</label>
-        <input type="text" th:field="*{name}" />
-        <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red;"></p>
+<!-- Fondo cambiado para que haga match con el Login -->
+<body style="background: linear-gradient(135deg, #f6f8fd 0%, #f1f5f9 100%); min-height:100vh;">
+
+<div class="container d-flex align-items-center justify-content-center min-vh-100 py-5 px-3">
+    <div style="width:100%; max-width:500px;">
+
+        <!-- Card sin el header suelto, todo encapsulado -->
+        <div class="card p-4 p-sm-5 border-0 shadow-lg" style="border-radius: 24px;">
+            
+            <div class="text-center mb-4">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                    <i class="bi bi-person-plus-fill fs-1"></i>
+                </div>
+                <h4 class="fw-bold text-dark">Crear Cuenta</h4>
+                <p class="text-muted small">Todos los campos marcados con * son obligatorios</p>
+            </div>
+
+            <form th:action="@{/register}" th:object="${registerUserDto}" method="POST">
+
+                <!-- Nombre -->
+                <div class="mb-3">
+                    <label for="name" class="form-label text-muted small fw-semibold">
+                        <i class="bi bi-person text-brand me-1"></i>Nombre *
+                    </label>
+                    <input type="text" id="name" th:field="*{name}" class="form-control bg-light" th:classappend="${#fields.hasErrors('name')} ? ' is-invalid'" placeholder="ej. María"/>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                </div>
+
+                <!-- Apellidos -->
+                <div class="row g-3 mb-3">
+                    <div class="col-sm-6">
+                        <label for="lastName" class="form-label text-muted small fw-semibold">1er Apellido *</label>
+                        <input type="text" id="lastName" th:field="*{lastName}" class="form-control bg-light" th:classappend="${#fields.hasErrors('lastName')} ? ' is-invalid'" placeholder="ej. García"/>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+                    </div>
+                    <div class="col-sm-6">
+                        <!-- Texto acortado para que no se desborde -->
+                        <label for="secondLastName" class="form-label text-muted small fw-semibold">2do Apellido <span class="fw-normal">(opcional)</span></label>
+                        <input type="text" id="secondLastName" th:field="*{secondLastName}" class="form-control bg-light" placeholder="ej. López"/>
+                    </div>
+                </div>
+
+                <hr class="my-4 border-light"/>
+
+                <!-- Username -->
+                <div class="mb-3">
+                    <label for="username" class="form-label text-muted small fw-semibold">
+                        <i class="bi bi-at text-brand me-1"></i>Nombre de Usuario *
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-at"></i></span>
+                        <input type="text" id="username" th:field="*{username}" class="form-control bg-light border-start-0" th:classappend="${#fields.hasErrors('username')} ? ' is-invalid'" placeholder="mi_usuario" autocomplete="username"/>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-4">
+                    <label for="password" class="form-label text-muted small fw-semibold">
+                        <i class="bi bi-shield-lock text-brand me-1"></i>Contraseña *
+                    </label>
+                    <!-- Wrapper relativo para el ojito -->
+                    <div class="position-relative">
+                        <input type="password" id="password" th:field="*{password}" class="form-control bg-light" style="padding-right: 2.5rem;" th:classappend="${#fields.hasErrors('password')} ? ' is-invalid'" placeholder="Mínimo 6 caracteres" autocomplete="new-password"/>
+                        <i class="bi bi-eye position-absolute top-50 end-0 translate-middle-y me-3 text-secondary fs-5" id="togglePassword" style="cursor: pointer; z-index: 10;"></i>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-brand w-100 py-3 fw-semibold shadow-sm">
+                    <i class="bi bi-person-check me-2"></i>Crear Cuenta
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <p class="text-muted small mb-0">¿Ya tienes cuenta? <a th:href="@{/}" class="text-decoration-none fw-bold text-brand">Inicia sesión</a></p>
+            </div>
+        </div>
+
     </div>
-    <div>
-        <label>Primer apellido:</label>
-        <input type="text" th:field="*{lastName}" />
-        <p th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" style="color:red;"></p>
-    </div>
-    <div>
-        <label>Segundo apellido:</label>
-        <input type="text" th:field="*{secondLastName}" />
-        <p th:if="${#fields.hasErrors('secondLastName')}" th:errors="*{secondLastName}" style="color:red;"></p>
-    </div>
-    <div>
-        <label>Usuario:</label>
-        <input type="text" th:field="*{username}" />
-        <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color:red;"></p>
-    </div>
-    <div>
-        <label>Contraseña:</label>
-        <input type="password" th:field="*{password}" />
-        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red;"></p>
-    </div>
-    <br>
-    <button type="submit">Enviar</button>
-</form>
-<a th:href="@{/users}">Cancelar</a>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

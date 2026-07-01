@@ -1,0 +1,3849 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+database/
+  agenda-web.pdf
+  build.sql
+  create.sql
+  poblado.sql
+  web-262.vpp
+  web-262.vpp.bak_000f
+  web-262.vpp.bak_001d
+  web-262.vpp.bak_002d
+  web-262.vpp.bak_003d
+src/
+  main/
+    java/
+      mx/
+        ipn/
+          upiicsa/
+            web/
+              ejemplo03/
+                contacts/
+                  bs/
+                    entity/
+                      Contact.java
+                    implementation/
+                      ContactsBs.java
+                  ctrl/
+                    dto/
+                      ContactDto.java
+                      RegisterContactDto.java
+                      UpdateContactDto.java
+                    ContactsCtrl.java
+                  persistence/
+                    dao/
+                      ContactsDao.java
+                    entity/
+                      ContactJpa.java
+                    repository/
+                      ContactJpaRepository.java
+                controlacceso/
+                  bs/
+                    entity/
+                      User.java
+                    implementation/
+                      LoginBs.java
+                      UserBs.java
+                  ctrl/
+                    dto/
+                      LoginDto.java
+                      RegisterUserDto.java
+                      UpdateUserDto.java
+                      UserDto.java
+                    LoginCtrl.java
+                    RegisterCtrl.java
+                    UsersCtrl.java
+                  persistence/
+                    dao/
+                      LoginDao.java
+                      UserDao.java
+                    entity/
+                      UserJpa.java
+                    repository/
+                      UserJpaRepository.java
+                medio/
+                  bs/
+                    entity/
+                      ContactMedium.java
+                    implementation/
+                      ContactMediumBs.java
+                  ctrl/
+                    dto/
+                      ContactMediumDto.java
+                      RegisterContactMediumDto.java
+                      UpdateContactMediumDto.java
+                    ContactMediaCtrl.java
+                  persistance/
+                    dao/
+                      ContactMediumDao.java
+                    entity/
+                      ContactMediumJpa.java
+                    repository/
+                      ContactMediumJpaRepository.java
+                security/
+                  AuthenticationFilter.java
+                tipo/
+                  bs/
+                    entity/
+                      ContactType.java
+                    implementation/
+                      ContactTypeBs.java
+                  persistance/
+                    dao/
+                      ContactTypeDao.java
+                    entity/
+                      ContactTypeJpa.java
+                    repository/
+                      ContactTypeJpaRepository.java
+                App.java
+    resources/
+      templates/
+        contacts/
+          media/
+            create.html
+            edit.html
+            index.html
+          destroy.html
+          edit.html
+          index.html
+          newContact.html
+        fragments/
+          layout.html
+        register/
+          new.html
+        users/
+          destroy.html
+          edit.html
+          index.html
+        index.html
+        welcome.html
+      application.properties
+    webapp/
+      css/
+        main.css
+      WEB-INF/
+        web.xml
+docker-compose.yml
+Dockerfile
+pom.xml
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="database/build.sql">
+SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='agenda-web';
+
+DROP DATABASE IF EXISTS "agenda-web";
+
+CREATE DATABASE "agenda-web";
+
+\c agenda-web
+CREATE EXTENSION unaccent;
+
+BEGIN;
+\i create.sql
+COMMIT;
+</file>
+
+<file path="database/create.sql">
+CREATE TABLE cag01_tipo_contacto (id_tipo SERIAL NOT NULL, tx_nombre varchar(100) NOT NULL, tx_descripcion varchar(255) NOT NULL, st_activo bool NOT NULL, PRIMARY KEY (id_tipo));
+CREATE TABLE tag01_usuario (id_usuario SERIAL NOT NULL, tx_nombre varchar(100) NOT NULL, tx_primer_apellido varchar(100) NOT NULL, tx_segundo_apellido varchar(100), tx_username varchar(50) NOT NULL UNIQUE, tx_password varchar(256) NOT NULL, PRIMARY KEY (id_usuario));
+CREATE TABLE tag02_contacto (id_contacto SERIAL NOT NULL, fk_id_usuario int4 NOT NULL, tx_nombre varchar(100) NOT NULL, tx_primer_apellido varchar(100) NOT NULL, tx_segundo_apellido varchar(100), tx_apodo varchar(20) NOT NULL, PRIMARY KEY (id_contacto));
+CREATE TABLE tag03_medio_contacto (id_medio_contacto SERIAL NOT NULL, fk_id_contacto int4 NOT NULL, fk_id_tipo int4 NOT NULL, tx_valor varchar(255) NOT NULL, PRIMARY KEY (id_medio_contacto));
+ALTER TABLE tag02_contacto ADD CONSTRAINT FKtag02_cont548851 FOREIGN KEY (fk_id_usuario) REFERENCES tag01_usuario (id_usuario);
+ALTER TABLE tag03_medio_contacto ADD CONSTRAINT FKtag03_medi265747 FOREIGN KEY (fk_id_contacto) REFERENCES tag02_contacto (id_contacto);
+ALTER TABLE tag03_medio_contacto ADD CONSTRAINT FKtag03_medi581297 FOREIGN KEY (fk_id_tipo) REFERENCES cag01_tipo_contacto (id_tipo);
+</file>
+
+<file path="database/poblado.sql">
+INSERT INTO cag01_tipo_contacto (id_tipo, tx_nombre, tx_descripcion, st_activo)
+VALUES (1, 'Correo Electrónico', 'Dirección de e-mail', true),
+       (2, 'Número Telefónico', 'Teléfono móvil o fijo', true),
+       (3, 'Instagram', 'Perfil de la red social', true);
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/contacts/bs/entity/Contact.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Builder
+@Setter
+@Getter
+public class Contact {
+    private Integer id;
+    private Integer idUser;
+    private String name;
+    private String lastName;
+    private String secondLastName;
+    private String nickname;
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/contacts/bs/implementation/ContactsBs.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.bs.implementation;
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.Contact;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.dao.ContactsDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+import java.util.Optional;
+
+import java.util.List;
+
+@Slf4j
+@Service
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+public class ContactsBs {
+
+    @Autowired
+    private  ContactsDao contactsDao; // 2. Tipo y variable consistentes
+
+    @Transactional(rollbackOn = Exception.class)
+    public void create(Contact contact, Integer idUsuarioLogueado) {
+        contact.setIdUser(idUsuarioLogueado);
+
+        // 3. Usamos la variable exacta
+        contactsDao.save(contact);
+    }
+
+    public List<Contact> getContacts(Integer idUser) {
+        // 4. Usamos la variable exacta
+        return contactsDao.findAll(idUser);
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public void update(Contact contact) {
+        contactsDao.save(contact);
+    }
+
+
+
+    public Contact findById(Integer id) {
+        // Retorna el contacto si existe, o null/excepción si no lo encuentra
+        return contactsDao.findById(id).orElse(null);
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public boolean delete(Integer idContacto) {
+        // Buscamos el contacto primero
+        Optional<Contact> contactResult = contactsDao.findById(idContacto);
+
+         if(contactResult.isPresent()){
+            contactsDao.delete(contactResult.get());
+            return true;
+        }
+
+        return false;
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/contacts/ctrl/dto/ContactDto.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.Contact;
+
+@Builder
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ContactDto {
+    private Integer id;
+    private Integer idUser;
+    private String name;
+    private String lastName;
+    private String secondLastName;
+    private String nickname;
+
+    public static ContactDto fromEntity(Contact entity) {
+        return ContactDto.builder()
+                .id(entity.getId())
+                .idUser(entity.getIdUser())
+                .name(entity.getName())
+                .lastName(entity.getLastName())
+                .secondLastName(entity.getSecondLastName())
+                .nickname(entity.getNickname())
+                .build();
+    }
+
+    public Contact toEntity() {
+        return Contact.builder()
+                .id(id)
+                .idUser(idUser)
+                .name(name)
+                .lastName(lastName)
+                .secondLastName(secondLastName)
+                .nickname(nickname)
+                .build();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/contacts/ctrl/dto/RegisterContactDto.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto;
+
+import lombok.*;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.Contact;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+public class RegisterContactDto {
+    // Solo los datos que el usuario ingresa en la pantalla de registro
+    private String name;
+    private String lastName;
+    private String secondLastName;
+    private String nickname;
+
+    // Método para transformar directo a Entidad de Negocio
+    public Contact toEntity() {
+        return Contact.builder()
+                .name(name)
+                .lastName(lastName)
+                .secondLastName(secondLastName)
+                .nickname(nickname)
+                .build();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/contacts/ctrl/dto/UpdateContactDto.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto;
+
+import lombok.*;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.Contact;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+public class UpdateContactDto {
+    private String name;
+    private String lastName;
+    private String secondLastName;
+    private String nickname;
+
+    public Contact toEntity() {
+        return Contact.builder()
+                .name(name)
+                .lastName(lastName)
+                .secondLastName(secondLastName)
+                .nickname(nickname)
+                .build();
+    }
+
+    public static UpdateContactDto fromEntity(Contact entity) {
+        return UpdateContactDto.builder()
+                .name(entity.getName())
+                .lastName(entity.getLastName())
+                .secondLastName(entity.getSecondLastName())
+                .nickname(entity.getNickname())
+                .build();
+    }
+}
+
+//todo es de user por el momento
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/contacts/ctrl/ContactsCtrl.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl;
+
+import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j; //
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.Contact;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.implementation.ContactsBs;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto.ContactDto;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto.RegisterContactDto;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto.UpdateContactDto;
+import java.util.Optional;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl.dto.UserDto;
+
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
+@Controller
+public class ContactsCtrl {
+
+    @Autowired
+    ContactsBs contactsBs;
+
+    //lectura
+    @GetMapping("/contacts")
+    public String getAll(Model model, HttpSession session) {
+        var user = (User) session.getAttribute("usuarioSesion");
+        var contacts = contactsBs.getContacts(user.getId());
+        List<ContactDto> contactDtos = new ArrayList<>();
+        for(Contact contact : contacts) {
+            contactDtos.add(ContactDto.fromEntity(contact));
+        }
+        model.addAttribute("contacts", contactDtos);
+        return "contacts/index";
+    }
+
+    //creacion
+    @GetMapping("/contacts/newContact")
+    public String editNew(Model model) {
+        // Enviamos el DTO de registro limpio usando un constructor vacío tradicional
+        model.addAttribute("registerContactDto", new RegisterContactDto());
+        return "contacts/newContact";
+    }
+
+    @PostMapping("/contacts")
+    public String create(
+            @ModelAttribute("registerContactDto") RegisterContactDto registerContactDto,
+            Model model,
+            RedirectAttributes redirectAttributes,
+            HttpSession session
+    ) {
+        log.info("Creating new contact via RegisterContactDto");
+
+        var user = (User) session.getAttribute("usuarioSesion");
+        if (user == null) {
+            log.error("Usuario no encontrado en sesión");
+            return "redirect:/login";
+        }
+
+        // Transformamos el DTO de registro a la entidad limpia
+        Contact contactEntity = registerContactDto.toEntity();
+
+        // Enviamos la entidad y el ID del usuario actual a la capa de negocio
+        contactsBs.create(contactEntity, user.getId());
+
+        redirectAttributes.addFlashAttribute("messageConfirmacion", "El contacto se registró exitosamente");
+        return "redirect:/contacts";
+    }
+
+    //Update (es el de users todavia)
+    @GetMapping("/contacts/{id}/edit")
+    public String edit(@PathVariable("id") Integer idContacto,  Model model) {
+        Contact resultadoContact = contactsBs.findById(idContacto);
+
+        if(resultadoContact != null) {
+            model.addAttribute("id", resultadoContact.getId());
+            model.addAttribute("contactDto", UpdateContactDto.fromEntity(resultadoContact));
+        } else {
+            model.addAttribute("contactDto", new UpdateContactDto());
+        }
+        return "contacts/edit";
+    }
+
+    @PutMapping("/contacts/{id}")
+    public String update(
+            @PathVariable("id") Integer idContacto,
+            UpdateContactDto updateContactDto,
+            Model model,
+            RedirectAttributes redirectAttributes,
+            HttpSession session
+    ) {
+        // Recuperamos el usuario logueado de la sesión
+        var user = (User) session.getAttribute("usuarioSesion");
+        if (user == null) {
+            log.error("Usuario no encontrado en sesión al actualizar");
+            return "redirect:/login";
+        }
+
+        Contact contact = updateContactDto.toEntity();
+        contact.setId(idContacto);
+        contact.setIdUser(user.getId()); // <-- 2. ASIGNAMOS EL ID DEL USUARIO (Esto resuelve el error)
+
+        contactsBs.update(contact);
+
+        redirectAttributes.addFlashAttribute("message", "Contacto actualizado con éxito");
+        return "redirect:/contacts";
+    }
+
+
+    //destruccion
+    @GetMapping("/contacts/{id}/destroy")
+    public String destroy(@PathVariable("id") Integer idContacto, Model model) {
+        // Buscamos el contacto usando el método que creamos antes
+        Contact contact = contactsBs.findById(idContacto);
+
+        if(contact != null) {
+            model.addAttribute("id", contact.getId());
+            // Convertimos a ContactDto para mostrar la info en el destroy.html
+            model.addAttribute("contactDto", ContactDto.fromEntity(contact));
+        } else {
+            // En caso de error (id inexistente), mandamos un DTO vacío o redirigimos
+            model.addAttribute("contactDto", new ContactDto());
+        }
+        return "contacts/destroy";
+    }
+
+    @DeleteMapping("/contacts/{id}")
+    public String delete(@PathVariable("id") Integer idContacto, RedirectAttributes redirectAttributes) {
+        // Ejecutamos la lógica de borrado
+        boolean eliminado = contactsBs.delete(idContacto);
+
+        if(eliminado) {
+            redirectAttributes.addFlashAttribute("messageConfirmacion", "Contacto eliminado con éxito");
+        } else {
+            redirectAttributes.addFlashAttribute("messageError", "No se pudo eliminar el contacto");
+        }
+
+        return "redirect:/contacts";
+    }
+
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/contacts/persistence/dao/ContactsDao.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.dao;
+
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.Contact;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.entity.ContactJpa;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.repository.ContactJpaRepository;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.repository.UserJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public class ContactsDao {
+    @Autowired
+    ContactJpaRepository contactJpaRepository;
+    @Autowired
+    UserJpaRepository userJpaRepository;
+
+    public List<Contact> findAll(Integer idUser) {
+        var userResult = userJpaRepository.findById(idUser);
+        List<Contact> contacts = new ArrayList<>();
+        if (userResult.isPresent()) {
+            contacts = userResult.get().getContacts()
+                    .stream()
+                    .map(ContactJpa::toEntity)
+                    .toList();
+        }
+        return contacts;
+    }
+
+    public Contact save(Contact contact) {
+        ContactJpa contactJpa = ContactJpa.fromEntity(contact);
+        var contactSavedJpa = contactJpaRepository.save(contactJpa);
+        return contactSavedJpa.toEntity();
+    }
+
+    public Optional<Contact> findById(Integer id) {
+        return contactJpaRepository.findById(id).map(ContactJpa::toEntity);
+    }
+
+    public void deleteById(Integer id) {
+        contactJpaRepository.deleteById(id);
+    }
+
+    public void delete(Contact contact) {
+        contactJpaRepository.delete(ContactJpa.fromEntity(contact));
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/contacts/persistence/entity/ContactJpa.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.Contact;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.entity.UserJpa;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+@Entity
+@Table(name = "tag02_contacto")
+public class ContactJpa {
+    @Id
+    @SequenceGenerator(name = "tag02_contacto_id_contacto_seq", sequenceName = "tag02_contacto_id_contacto_seq", allocationSize = 1)
+    @GeneratedValue(generator = "tag02_contacto_id_contacto_seq", strategy = GenerationType.SEQUENCE)
+    @Column(name = "id_contacto")
+    private Integer id;
+    @Column(name = "fk_id_usuario")
+    private Integer idUser;
+    @Column(name = "tx_nombre")
+    private String name;
+    @Column(name = "tx_primer_apellido")
+    private String lastName;
+    @Column(name = "tx_segundo_apellido")
+    private String secondLastName;
+    @Column(name = "tx_apodo")
+    private String nickname;
+    @ManyToOne
+    @JoinColumn(name = "fk_id_usuario", referencedColumnName = "id_usuario", insertable = false, updatable = false)
+    private UserJpa user;
+
+    public static ContactJpa fromEntity(Contact entity) {
+        return ContactJpa.builder()
+                .id(entity.getId())
+                .idUser(entity.getIdUser())
+                .name(entity.getName())
+                .lastName(entity.getLastName())
+                .secondLastName(entity.getSecondLastName())
+                .nickname(entity.getNickname())
+                .build();
+    }
+
+    public Contact toEntity() {
+        return Contact.builder()
+                .id(id)
+                .idUser(idUser)
+                .name(name)
+                .lastName(lastName)
+                .secondLastName(secondLastName)
+                .nickname(nickname)
+                .build();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/contacts/persistence/repository/ContactJpaRepository.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.repository;
+
+import mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.entity.ContactJpa;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ContactJpaRepository extends JpaRepository<ContactJpa, Integer> {
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/bs/entity/User.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.entity;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serializable;
+
+@Builder
+@Setter
+@Getter
+public class User implements Serializable {
+    private Integer id;
+    private String name;
+    private String lastName;
+    private String secondLastName;
+    private String username;
+    private String password;
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/bs/implementation/LoginBs.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.implementation;
+
+import lombok.extern.slf4j.Slf4j;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.entity.User;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.dao.LoginDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Slf4j
+@Service
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+public class LoginBs {
+    @Autowired
+    LoginDao loginDao;
+
+    public Optional<User> login(String username, String password){
+        log.info("LoginBs.login()");
+        return loginDao.login(username, password);
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/bs/implementation/UserBs.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.implementation;
+
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.entity.User;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.dao.UserDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Slf4j
+@Service
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+public class UserBs {
+    @Autowired
+    UserDao userDao;
+
+    @Transactional(rollbackOn = Exception.class)
+    public void create(User user){
+        log.info("Creando usuario: {}",user.getId());
+        var userSaved = userDao.save(user);
+        log.info("Usuario guardado: {}",userSaved.getId());
+    }
+
+    public List<User> findAll() {
+        return userDao.findAll();
+    }
+
+    public Optional<User> findById(Integer idUsuario) {
+        return userDao.findById(idUsuario);
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public boolean update(User user) {
+        var userResult = userDao.findById(user.getId());
+        if(userResult.isPresent()){
+            var userSaved = userResult.get();
+            userSaved.setName(user.getName());
+            userSaved.setLastName(user.getLastName());
+            userSaved.setSecondLastName(user.getSecondLastName());
+            userSaved.setUsername(user.getUsername());
+            log.info("Usuario BS: {}",userSaved.getPassword());
+            userDao.save(userSaved);
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public boolean delete(Integer idUsuario) {
+        Optional<User> userResult = userDao.findById(idUsuario);
+        if(userResult.isPresent()){
+            userDao.delete(userResult.get());
+            return true;
+        }
+        return false;
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/ctrl/dto/LoginDto.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl.dto;
+
+import jakarta.validation.constraints.NotEmpty;
+import lombok.*;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+public class LoginDto {
+    @NotEmpty(message = "Favor de proporcionar el usuario")
+    private String username;
+    @NotEmpty(message = "Favor de proporcionar el password")
+    private String password;
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/ctrl/dto/RegisterUserDto.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl.dto;
+
+import lombok.*;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.entity.User;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+public class RegisterUserDto {
+    private String name;
+    private String lastName;
+    private String secondLastName;
+    private String username;
+    private String password;
+
+    public User toEntity() {
+        return User.builder()
+                .name(name)
+                .lastName(lastName)
+                .secondLastName(secondLastName)
+                .username(username)
+                .password(password)
+                .build();
+    }
+
+    public static RegisterUserDto fromEntity(User entity) {
+        return RegisterUserDto.builder()
+                .name(entity.getName())
+                .lastName(entity.getLastName())
+                .secondLastName(entity.getSecondLastName())
+                .username(entity.getUsername())
+                .build();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/ctrl/dto/UpdateUserDto.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl.dto;
+
+import lombok.*;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.entity.User;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+public class UpdateUserDto {
+    private String name;
+    private String lastName;
+    private String secondLastName;
+    private String username;
+
+    public User toEntity() {
+        return User.builder()
+                .name(name)
+                .lastName(lastName)
+                .secondLastName(secondLastName)
+                .username(username)
+                .build();
+    }
+
+    public static UpdateUserDto fromEntity(User entity) {
+        return UpdateUserDto.builder()
+                .name(entity.getName())
+                .lastName(entity.getLastName())
+                .secondLastName(entity.getSecondLastName())
+                .username(entity.getUsername())
+                .build();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/ctrl/dto/UserDto.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl.dto;
+
+import lombok.*;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.entity.User;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+public class UserDto {
+    private Integer id;
+    private String name;
+    private String lastName;
+    private String secondLastName;
+    private String username;
+    private String password;
+
+    public User toEntity() {
+        return User.builder()
+                .name(name)
+                .lastName(lastName)
+                .secondLastName(secondLastName)
+                .username(username)
+                .password(password)
+                .build();
+    }
+
+    public static UserDto fromEntity(User entity) {
+        return UserDto.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .lastName(entity.getLastName())
+                .secondLastName(entity.getSecondLastName())
+                .username(entity.getUsername())
+                .build();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/ctrl/LoginCtrl.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl;
+
+import jakarta.validation.Valid;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.entity.User;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.implementation.LoginBs;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl.dto.LoginDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import jakarta.servlet.http.HttpSession;
+
+import java.util.Optional;
+
+@Controller
+public class LoginCtrl {
+    private static final Logger log = LoggerFactory.getLogger(LoginCtrl.class);
+    @Autowired
+    LoginBs loginBs;
+
+    @GetMapping("/")
+    public String inicio(Model model, HttpSession session) {
+        // El "Modelo" sirve para enviar datos a la "Vista"
+        log.info("Inicio: pasando por inicio");
+        String resultado;
+        var usuarioSesion = (User) session.getAttribute("usuarioSesion");
+        if(usuarioSesion != null) {
+            resultado = "redirect:/welcome";
+        } else {
+            model.addAttribute("usuarioDto", LoginDto.builder().build());
+            populateLogin(model);
+            resultado = "index";// Retorna el nombre del archivo HTML (src/main/resources/templates/index.html)
+        }
+        return resultado;
+    }
+
+    public void populateLogin(Model model){
+        model.addAttribute("mensaje", "¡Bienvenido a mi aplicación Spring Boot MVC con Java 21!");
+    }
+
+    @PostMapping("/")
+    public String procesarLogin(@Valid @ModelAttribute("usuarioDto") LoginDto user,
+                                BindingResult result,
+                                Model model,
+                                HttpSession session
+    ) {
+        if(result.hasErrors()) {
+            log.info("El formulario tiene errores");
+            populateLogin(model);
+            return "index";
+        }
+        // Aquí puedes validar los datos o imprimir en consola para probar
+        System.out.println("Usuario recibido: " + user.getUsername());
+        System.out.println("Password recibido: " + user.getPassword());
+        Optional<User> resultadoUsuario = loginBs.login(user.getUsername(), user.getPassword());
+        if (resultadoUsuario.isPresent()) {
+            model.addAttribute("resultado", "¡Acceso concedido!");
+            session.setAttribute("usuarioSesion", resultadoUsuario.get());
+            return "redirect:/welcome";
+        } else {
+            populateLogin(model);
+            return "index";
+        }
+    }
+
+    @GetMapping("/welcome")
+    public String welcome() {
+        return "welcome";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/";
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/ctrl/RegisterCtrl.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl;
+
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.implementation.UserBs;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl.dto.RegisterUserDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+public class RegisterCtrl {
+    private static final Logger log = LoggerFactory.getLogger(RegisterCtrl.class);
+    @Autowired
+    UserBs userBs;
+
+    @GetMapping("/register/new")
+    public String editNew(Model model){
+        model.addAttribute("registerUserDto", RegisterUserDto.builder().build());
+        return "register/new";
+    }
+
+    @PostMapping("/register")
+    public String create(@ModelAttribute("registerUserDto") RegisterUserDto registerUserDto, Model model, RedirectAttributes redirectAttributes){
+        log.info("Creating new user");
+        redirectAttributes.addFlashAttribute("messageConfirmacion","El usuario se registró exitósamente");
+        userBs.create(registerUserDto.toEntity());
+        return "redirect:/";
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/ctrl/UsersCtrl.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl;
+
+import lombok.extern.slf4j.Slf4j;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.entity.User;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.implementation.UserBs;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl.dto.RegisterUserDto;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl.dto.UpdateUserDto;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.ctrl.dto.UserDto;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.dao.UserDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.servlet.http.HttpSession;
+
+import java.util.ArrayList;
+import java.util.Optional;
+
+@Slf4j
+@Controller
+public class UsersCtrl {
+    @Autowired
+    UserBs userBs;
+    @Autowired
+    private UserDao userDao;
+
+    @GetMapping("/users")
+    public String index(Model model) {
+        var users = userBs.findAll();
+        var usersDto = new ArrayList<UserDto>();
+        for(var user : users) {
+            usersDto.add(UserDto.fromEntity(user));
+            log.info("{} {}", user.getId(), user.getUsername());
+        }
+        model.addAttribute("personas", usersDto);
+        return "users/index";
+    }
+
+
+    //denegar la edicion de usuarios ajenos
+    @GetMapping("/users/{id}/edit")
+    public String edit(@PathVariable("id") Integer idUsuario, Model model, HttpSession session) {
+        // 1. Recuperar el usuario usando la clase original de tu sesión
+        User usuarioSesion = (User) session.getAttribute("usuarioSesion");
+
+        // 2. Si no hay sesión iniciada, rebota al login
+        if (usuarioSesion == null) {
+            return "redirect:/login";
+        }
+
+       if (!usuarioSesion.getId().equals(idUsuario)) {
+            return "redirect:/contacts?error=NoAutorizado";
+        }
+
+        Optional<User> resultadoUser = userBs.findById(idUsuario);
+        if (resultadoUser.isPresent()) {
+            model.addAttribute("id", resultadoUser.get().getId());
+            model.addAttribute("userDto", UpdateUserDto.fromEntity(resultadoUser.get()));
+        } else {
+            return "redirect:/contacts";
+        }
+
+        return "users/edit";
+    }
+
+
+
+    @PutMapping("/users/{id}")
+    public String update(@PathVariable("id") Integer idUsuario, UpdateUserDto updateUserDto, Model model, RedirectAttributes redirectAttributes) {
+        User user = updateUserDto.toEntity();
+        user.setId(idUsuario);
+        var resultdo = userBs.update(user);
+        redirectAttributes.addFlashAttribute("message", "Usuario actualizado con exito");
+        return "redirect:/users";
+    }
+
+    @GetMapping("/users/{id}/destroy")
+    public String destroy(@PathVariable("id") Integer idUsuario,  Model model) {
+        Optional<User> resultadoUser= userBs.findById(idUsuario);
+        if(resultadoUser.isPresent()) {
+            model.addAttribute("id", resultadoUser.get().getId());
+            model.addAttribute("userDto", UpdateUserDto.fromEntity(resultadoUser.get()));
+        } else {
+            model.addAttribute("userDto", new UpdateUserDto());
+        }
+        return "users/destroy";
+    }
+
+    @DeleteMapping("/users/{id}")
+    public String delete(@PathVariable("id") Integer idUsuario, Model model, RedirectAttributes redirectAttributes) {
+        var resultdo = userBs.delete(idUsuario);
+        redirectAttributes.addFlashAttribute("message", "Usuario actualizado con exito");
+        return "redirect:/users";
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/persistence/dao/LoginDao.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.dao;
+
+import lombok.extern.slf4j.Slf4j;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.entity.User;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.entity.UserJpa;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.repository.UserJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Slf4j
+@Repository
+public class LoginDao {
+    @Autowired
+    UserJpaRepository userJpaRepository;
+
+    public Optional<User> login(String username, String password) {
+        //Optional<UsuarioJpa> resultado = usuarioJpaRepository.findByUsernameAndPassword(username, password);
+        //if (resultado.isPresent()) {
+        //    return Optional.of(resultado.get().toEntity());
+        //} else {
+        //    return Optional.empty();
+        //}
+        var resultado = userJpaRepository.findByUsernameAndPassword(username, password);
+        //return resultado.map(usuarioJpa -> usuarioJpa.toEntity());
+        return resultado.map(UserJpa::toEntity);
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/persistence/dao/UserDao.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.dao;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+import jakarta.persistence.Tuple;
+import lombok.extern.slf4j.Slf4j;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.entity.User;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.entity.UserJpa;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.repository.UserJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Slf4j
+@Repository
+public class UserDao {
+    @Autowired
+    UserJpaRepository userJpaRepository;
+    @Autowired
+    EntityManager entityManager;
+
+    //private static final String QUERY_FIND_ALL = "select * from usuario";
+    //private static final String QUERY_DELETE_BY_ID = "delete from usuario where id_usuario = :id";
+
+    private static final String QUERY_FIND_ALL = "select * from tag01_usuario";
+    private static final String QUERY_DELETE_BY_ID = "delete from tag01_usuario where id_usuario = :id";
+
+    public User save(User user) {
+        log.info("Usuario DAO: {}",user.getPassword());
+        var userSavedJpa = userJpaRepository.save(UserJpa.fromEntity(user));
+        return userSavedJpa.toEntity();
+    }
+
+    public List<User> findAll() {
+        //var usuariosJpa = userJpaRepository.findAll();
+        //List<User> users = new ArrayList<>();
+        //for(UserJpa usuarioJpa: usuariosJpa) {
+        //    users.add(usuarioJpa.toEntity());
+        //}
+        //return users;
+        //return userJpaRepository
+        //        .findAll()
+        //        .stream()
+        //        .map(UserJpa::toEntity)
+        //        .toList();
+        //Query query = entityManager.createNativeQuery(QUERY_FIND_ALL);
+        //List<UserJpa> usersJpa = query.getResultList();
+        //return usersJpa.stream().map(UserJpa::toEntity).toList();
+        //Query query = entityManager.createNativeQuery(QUERY_FIND_ALL);
+        //List<Object[]> resultados = query.getResultList();
+        //return resultados.stream().map(row -> User.builder()
+        //            .id((Integer) row[0])
+        //            .name((String) row[1])
+        //            .lastName((String) row[2])
+        //            .secondLastName((String) row[3])
+        //            .username((String) row[4])
+        //            .password((String) row[5])
+        //            .build()
+        //).toList();
+        Query query = entityManager.createNativeQuery(QUERY_FIND_ALL, Tuple.class);
+        List<Tuple> resultados = query.getResultList();
+        return resultados.stream().map(tuple -> User.builder()
+                    .id(tuple.get("id_usuario",Integer.class))
+                    .name(tuple.get("tx_nombre",String.class))
+                    .lastName(tuple.get("tx_primer_apellido",String.class))
+                    .secondLastName(tuple.get("tx_segundo_apellido",String.class))
+                    .username(tuple.get("tx_username",String.class))
+                    .password(tuple.get("tx_password",String.class))
+                    .build()
+        ).toList();
+    }
+
+    public Optional<User> findById(Integer idUsuario) {
+        return userJpaRepository.findById(idUsuario).map(UserJpa::toEntity);
+    }
+
+    public void delete(User user) {
+        //userJpaRepository.delete(UserJpa.fromEntity(user));
+        //userJpaRepository.deleteById(user.getId());
+        //Query query = entityManager.createQuery("delete from UserJpa u where u.id = :id");
+        Query query = entityManager.createNativeQuery(QUERY_DELETE_BY_ID);
+        query.setParameter("id", user.getId());
+        query.executeUpdate();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/persistence/entity/UserJpa.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.entity.ContactJpa;
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.bs.entity.User;
+
+import java.util.List;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+@Entity
+@Table(name = "tag01_usuario")
+public class UserJpa {
+    @Id
+    @SequenceGenerator(name = "tag01_usuario_id_usuario_seq", sequenceName = "tag01_usuario_id_usuario_seq", allocationSize = 1)
+    @GeneratedValue(generator = "tag01_usuario_id_usuario_seq", strategy = GenerationType.SEQUENCE)
+    @Column(name = "id_usuario")
+    private Integer id;
+    @Column(name = "tx_nombre")
+    private String nombre;
+    @Column(name = "tx_primer_apellido")
+    private String primerApellido;
+    @Column(name = "tx_segundo_apellido")
+    private String segundoApellido;
+    @Column(name = "tx_username")
+    private String username;
+    @Column(name = "tx_password")
+    private String password;
+    @OneToMany(mappedBy = "user")
+    private List<ContactJpa> contacts;
+
+    public static UserJpa fromEntity(User entity) {
+        return UserJpa.builder()
+                .id(entity.getId())
+                .nombre(entity.getName())
+                .primerApellido(entity.getLastName())
+                .segundoApellido(entity.getSecondLastName())
+                .username(entity.getUsername())
+                .password(entity.getPassword())
+                .build();
+    }
+
+    public User toEntity() {
+        return User.builder()
+                .id(id)
+                .name(nombre)
+                .lastName(primerApellido)
+                .secondLastName(segundoApellido)
+                .username(username)
+                .password(password)
+                .build();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/controlacceso/persistence/repository/UserJpaRepository.java">
+package mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.repository;
+
+import mx.ipn.upiicsa.web.ejemplo03.controlacceso.persistence.entity.UserJpa;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface UserJpaRepository extends JpaRepository<UserJpa,Integer> {
+    Optional<UserJpa> findByUsernameAndPassword(String username, String password);
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/medio/bs/entity/ContactMedium.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Builder
+@Getter
+@Setter
+public class ContactMedium {
+    private Integer id;
+    private Integer idContact;
+    private Integer idType;
+    private String value;
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/medio/bs/implementation/ContactMediumBs.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.bs.implementation;
+
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.ContactMedium;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.dao.ContactMediumDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class ContactMediumBs {
+
+    @Autowired
+    private ContactMediumDao contactMediumDao;
+
+    //read
+    @Transactional(readOnly = true)
+    public List<ContactMedium> findByContact(Integer idContact) {
+        return contactMediumDao.findByIdContact(idContact);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ContactMedium> findById(Integer id) {
+        return contactMediumDao.findById(id);
+    }
+
+   //guardar (insert)
+    @Transactional
+    public ContactMedium save(ContactMedium contactMedium) {
+        return contactMediumDao.save(contactMedium);
+    }
+
+    // update: el DAO reutiliza save(); JPA detecta el id presente y emite UPDATE
+    @Transactional
+    public ContactMedium update(ContactMedium contactMedium) {
+        return contactMediumDao.save(contactMedium);
+    }
+
+    //borrar
+    @Transactional
+    public void deleteById(Integer id) {
+        contactMediumDao.deleteById(id);
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/medio/ctrl/dto/ContactMediumDto.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto;
+
+import lombok.Builder;
+import lombok.Getter;
+
+@Builder
+@Getter
+public class ContactMediumDto {
+    private Integer id;
+    private Integer idContact;
+    private Integer idType;
+    private String typeName; // Nombre del tipo (ej: "Instagram") para mostrarlo en la tabla
+    private String value;     // El valor (ej: "@usuario")
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/medio/ctrl/dto/RegisterContactMediumDto.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.ContactMedium;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+
+@Getter
+@Setter
+public class RegisterContactMediumDto {
+    @NotNull(message = "El tipo de medio es obligatorio.")
+    private Integer idType;
+
+    @NotBlank(message = "El valor no puede estar vacío.")
+    // Esta expresión regular permite tanto correos válidos como números telefónicos de 10 dígitos
+    @Pattern(
+            regexp = "^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}|[0-9]{10})$",
+            message = "El formato introducido no corresponde a un correo válido o un teléfono de 10 dígitos."
+    )
+    private String value;
+
+    public ContactMedium toEntity() {
+        return ContactMedium.builder()
+                .idType(idType)
+                .value(value)
+                .build();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/medio/ctrl/dto/UpdateContactMediumDto.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.ContactMedium;
+
+@Getter
+@Setter
+public class UpdateContactMediumDto {
+    private Integer id;
+    private Integer idType;
+    private String value;
+
+    public ContactMedium toEntity() {
+        return ContactMedium.builder()
+                .id(id)
+                .idType(idType)
+                .value(value)
+                .build();
+    }
+
+    public static UpdateContactMediumDto fromEntity(ContactMedium entity) {
+        UpdateContactMediumDto dto = new UpdateContactMediumDto();
+        dto.setId(entity.getId());
+        dto.setIdType(entity.getIdType());
+        dto.setValue(entity.getValue());
+        return dto;
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/medio/ctrl/ContactMediaCtrl.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl;
+
+import jakarta.servlet.http.HttpSession;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.ContactMedium;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.implementation.ContactMediumBs;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto.RegisterContactMediumDto;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.ctrl.dto.UpdateContactMediumDto;
+import mx.ipn.upiicsa.web.ejemplo03.tipo.bs.implementation.ContactTypeBs;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+import java.util.Optional;
+
+@Controller
+public class ContactMediaCtrl {
+
+    @Autowired
+    private ContactMediumBs contactMediumBs;
+
+    @Autowired
+    private ContactTypeBs contactTypeBs;
+
+    /**
+     * Muestra la pantalla con la lista de medios de un contacto específico.
+     */
+    @GetMapping("/contacts/{idContact}/media")
+    public String index(@PathVariable("idContact") Integer idContact, Model model, HttpSession session) {
+        if (session.getAttribute("usuarioSesion") == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("idContact", idContact);
+        model.addAttribute("mediaList", contactMediumBs.findByContact(idContact));
+        return "contacts/media/index";
+    }
+
+
+    @GetMapping("/contacts/{idContact}/media/create")
+    public String create(@PathVariable("idContact") Integer idContact, Model model, HttpSession session) {
+        if (session.getAttribute("usuarioSesion") == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("idContact", idContact);
+        model.addAttribute("registerContactMediumDto", new RegisterContactMediumDto());
+        model.addAttribute("types", contactTypeBs.getAllTypes());
+        return "contacts/media/create";
+    }
+
+    @PostMapping("/contacts/{idContact}/media")
+    public String store(
+            @PathVariable("idContact") Integer idContact,
+            @Valid @ModelAttribute("registerContactMediumDto")RegisterContactMediumDto dto,
+            BindingResult bindingResult,
+            Model model,
+            RedirectAttributes redirectAttributes,
+            HttpSession session
+    ) {
+        if (session.getAttribute("usuarioSesion") == null) {
+            return "redirect:/login";
+        }
+        if (bindingResult.hasErrors()) {
+            // Volvemos a cargar las variables necesarias para pintar la vista de creación de nuevo
+            model.addAttribute("idContact", idContact);
+            model.addAttribute("types", contactTypeBs.getAllTypes());
+            // Regresamos al usuario al formulario (el DTO llevará el mensaje de error arrastrando)
+            return "contacts/media/create";
+        }
+        //flujo normal
+        ContactMedium contactMedium = dto.toEntity();
+        contactMedium.setIdContact(idContact);
+        contactMediumBs.save(contactMedium);
+        redirectAttributes.addFlashAttribute("message", "Medio de contacto agregado con éxito");
+        return "redirect:/contacts/" + idContact + "/media";
+    }
+
+
+    @DeleteMapping("/contacts/{idContact}/media/{id}")
+    public String destroy(
+            @PathVariable("idContact") Integer idContact,
+            @PathVariable("id") Integer id,
+            RedirectAttributes redirectAttributes,
+            HttpSession session
+    ) {
+        if (session.getAttribute("usuarioSesion") == null) {
+            return "redirect:/login";
+        }
+
+        contactMediumBs.deleteById(id);
+        redirectAttributes.addFlashAttribute("message", "Medio de contacto eliminado correctamente");
+        return "redirect:/contacts/" + idContact + "/media";
+    }
+
+    // Carga el formulario de edición con los datos actuales del medio
+    @GetMapping("/contacts/{idContact}/media/{id}/edit")
+    public String edit(
+            @PathVariable("idContact") Integer idContact,
+            @PathVariable("id") Integer id,
+            Model model,
+            HttpSession session
+    ) {
+        if (session.getAttribute("usuarioSesion") == null) {
+            return "redirect:/";
+        }
+
+        Optional<ContactMedium> resultado = contactMediumBs.findById(id);
+        if (resultado.isEmpty()) {
+            return "redirect:/contacts/" + idContact + "/media";
+        }
+
+        model.addAttribute("idContact", idContact);
+        model.addAttribute("updateContactMediumDto", UpdateContactMediumDto.fromEntity(resultado.get()));
+        model.addAttribute("types", contactTypeBs.getAllTypes());
+        return "contacts/media/edit";
+    }
+
+    // Recibe el form con _method=PUT; toma el id del path para no depender del campo oculto del form
+    @PutMapping("/contacts/{idContact}/media/{id}")
+    public String update(
+            @PathVariable("idContact") Integer idContact,
+            @PathVariable("id") Integer id,
+            @ModelAttribute("updateContactMediumDto") UpdateContactMediumDto dto,
+            RedirectAttributes redirectAttributes,
+            HttpSession session
+    ) {
+        if (session.getAttribute("usuarioSesion") == null) {
+            return "redirect:/";
+        }
+
+        ContactMedium contactMedium = dto.toEntity();
+        contactMedium.setId(id);           // el id viene del path, no del form (evita manipulación)
+        contactMedium.setIdContact(idContact);  // mantiene la FK al contacto padre
+        contactMediumBs.update(contactMedium);
+
+        redirectAttributes.addFlashAttribute("message", "Medio de contacto actualizado correctamente");
+        // Redirige al listado del contacto (PRG pattern: evita reenvío del form al refrescar)
+        return "redirect:/contacts/" + idContact + "/media";
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/medio/persistance/dao/ContactMediumDao.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.dao;
+
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.ContactMedium;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.entity.ContactMediumJpa;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.repository.ContactMediumJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
+
+@Component
+public class ContactMediumDao {
+
+    @Autowired
+    private ContactMediumJpaRepository contactMediumJpaRepository;
+
+ //crear
+    public ContactMedium save(ContactMedium contactMedium) {
+        ContactMediumJpa jpa = ContactMediumJpa.fromEntity(contactMedium);
+        ContactMediumJpa savedJpa = contactMediumJpaRepository.save(jpa);
+        return savedJpa.toEntity();
+    }
+
+   //eliminar por id
+    public void deleteById(Integer id) {
+        contactMediumJpaRepository.deleteById(id);
+    }
+
+   //read
+    public Optional<ContactMedium> findById(Integer id) {
+        return contactMediumJpaRepository.findById(id)
+                .map(ContactMediumJpa::toEntity);
+    }
+
+    /**
+     * Recupera todos los medios asociados a un contacto en específico.
+     */
+    public List<ContactMedium> findByIdContact(Integer idContact) {
+        List<ContactMediumJpa> jpaList = contactMediumJpaRepository.findByIdContact(idContact);
+        return jpaList.stream()
+                .map(ContactMediumJpa::toEntity)
+                .toList();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/medio/persistance/entity/ContactMediumJpa.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import mx.ipn.upiicsa.web.ejemplo03.contacts.bs.entity.ContactMedium;
+import mx.ipn.upiicsa.web.ejemplo03.tipo.persistence.entity.ContactTypeJpa;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+@Entity
+@Table(name = "tag03_medio_contacto")
+public class ContactMediumJpa {
+
+    @Id
+    @SequenceGenerator(name = "tag03_medio_contacto_id_medio_contacto_seq", sequenceName = "tag03_medio_contacto_id_medio_contacto_seq", allocationSize = 1)
+    @GeneratedValue(generator = "tag03_medio_contacto_id_medio_contacto_seq", strategy = GenerationType.SEQUENCE)
+    @Column(name = "id_medio_contacto")
+    private Integer id;
+
+    @Column(name = "fk_id_contacto")
+    private Integer idContact;
+    @Column(name = "fk_id_tipo")
+    private Integer idType;
+    @Column(name = "tx_valor")
+    private String value;
+    @ManyToOne
+    @JoinColumn(name = "fk_id_contacto", referencedColumnName = "id_contacto", insertable = false, updatable = false)
+    private ContactJpa contact;
+    @ManyToOne
+    @JoinColumn(name = "fk_id_tipo", referencedColumnName = "id_tipo", insertable = false, updatable = false)
+    private ContactTypeJpa type;
+
+    public static ContactMediumJpa fromEntity(ContactMedium entity) {
+        return ContactMediumJpa.builder()
+                .id(entity.getId())
+                .idContact(entity.getIdContact())
+                .idType(entity.getIdType())
+                .value(entity.getValue())
+                .build();
+    }
+
+    public ContactMedium toEntity() {
+        return ContactMedium.builder()
+                .id(id)
+                .idContact(idContact)
+                .idType(idType)
+                .value(value)
+                .build();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/medio/persistance/repository/ContactMediumJpaRepository.java">
+package mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.repository;
+
+import mx.ipn.upiicsa.web.ejemplo03.contacts.persistence.entity.ContactMediumJpa;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface ContactMediumJpaRepository extends JpaRepository<ContactMediumJpa, Integer> {
+
+        List<ContactMediumJpa> findByIdContact(Integer idContact);
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/security/AuthenticationFilter.java">
+package mx.ipn.upiicsa.web.ejemplo03.security;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpFilter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import java.io.IOException;
+import java.util.List;
+
+@Slf4j
+@Component
+public class AuthenticationFilter extends HttpFilter {
+
+    // 1. Definimos las rutas públicas que NO requieren sesión
+    private final List<String> rutasPublicas = List.of(
+            "/",                      // Tu pantalla de login actual (POST y GET)
+            "/register",                // Pantalla de registro
+            "/register/new",           // Operación de registro
+            "/recuperar-contrasena",  // Recuperación
+            "/confirmar-contrasena",  // Confirmación
+            "/logout"                 // Ruta de salida
+    );
+
+    // 2. Definimos los prefijos de recursos estáticos permitidos
+    private final List<String> recursosEstaticos = List.of(
+            "/css/", "/js/", "/images/", "/favicon.ico"
+    );
+
+    @Override
+    protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+
+        String uri = request.getRequestURI();
+
+        // 3. Verificar si la URI actual es un recurso público o estático
+        boolean esPublico = rutasPublicas.contains(uri) ||
+                recursosEstaticos.stream().anyMatch(uri::startsWith);
+
+        if (esPublico) {
+            // Si es público, lo dejamos pasar sin validar sesión
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // 4. Validar la sesión para rutas protegidas
+        HttpSession session = request.getSession(false); // false = no crea una sesión nueva si no existe
+
+        if (session != null && session.getAttribute("usuarioSesion") != null) {
+            // Hay una sesión válida y el usuario está guardado, puede continuar
+            log.info("Usuario autenticado: {}", uri);
+            if(uri.equals("/")) {
+                response.sendRedirect(request.getContextPath() + "/welcome");
+            }
+            chain.doFilter(request, response);
+        } else {
+            // No está autenticado: redirige a la raíz (pantalla de login)
+            response.sendRedirect(request.getContextPath() + "/");
+        }
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/tipo/bs/entity/ContactType.java">
+package mx.ipn.upiicsa.web.ejemplo03.tipo.bs.entity;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Builder
+@Getter
+@Setter
+public class ContactType {
+    private Integer id;
+    private String name;
+    private String description;
+    private Boolean active;
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/tipo/bs/implementation/ContactTypeBs.java">
+package mx.ipn.upiicsa.web.ejemplo03.tipo.bs.implementation;
+
+import mx.ipn.upiicsa.web.ejemplo03.tipo.bs.entity.ContactType;
+import mx.ipn.upiicsa.web.ejemplo03.tipo.persistence.dao.ContactTypeDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class ContactTypeBs {
+
+    @Autowired
+    private ContactTypeDao contactTypeDao;
+
+    // Método principal para obtener todos los tipos de contacto (ej: para un select)
+    public List<ContactType> getAllTypes() {
+        return contactTypeDao.findAll();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/tipo/persistance/dao/ContactTypeDao.java">
+package mx.ipn.upiicsa.web.ejemplo03.tipo.persistence.dao;
+
+import mx.ipn.upiicsa.web.ejemplo03.tipo.bs.entity.ContactType;
+import mx.ipn.upiicsa.web.ejemplo03.tipo.persistence.entity.ContactTypeJpa;
+import mx.ipn.upiicsa.web.ejemplo03.tipo.persistence.repository.ContactTypeJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class ContactTypeDao {
+
+    @Autowired
+    private ContactTypeJpaRepository contactTypeJpaRepository;
+
+    public List<ContactType> findAll() {
+        List<ContactTypeJpa> jpaList = contactTypeJpaRepository.findAll();
+
+        return jpaList.stream()
+                .map(ContactTypeJpa::toEntity)
+                .toList();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/tipo/persistance/entity/ContactTypeJpa.java">
+package mx.ipn.upiicsa.web.ejemplo03.tipo.persistence.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import mx.ipn.upiicsa.web.ejemplo03.tipo.bs.entity.ContactType;
+
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+@Entity
+@Table(name = "cag01_tipo_contacto")
+public class ContactTypeJpa {
+
+    @Id
+    @Column(name = "id_tipo")
+    private Integer id;
+
+    @Column(name = "tx_nombre")
+    private String name;
+
+    @Column(name = "tx_descripcion")
+    private String description;
+
+    @Column(name = "st_activo")
+    private Boolean active; // Corregido de Bool a Boolean
+
+    // Mapeo corregido: Nombre de clase consistente
+    public static ContactTypeJpa fromEntity(ContactType entity) {
+        return ContactTypeJpa.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .description(entity.getDescription())
+                .active(entity.getActive())
+                .build();
+    }
+
+    public ContactType toEntity() {
+        return ContactType.builder()
+                .id(id)
+                .name(name)
+                .description(description)
+                .active(active)
+                .build();
+    }
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/tipo/persistance/repository/ContactTypeJpaRepository.java">
+package mx.ipn.upiicsa.web.ejemplo03.tipo.persistence.repository;
+
+import mx.ipn.upiicsa.web.ejemplo03.tipo.persistence.entity.ContactTypeJpa;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ContactTypeJpaRepository extends JpaRepository<ContactTypeJpa, Integer> {
+
+}
+</file>
+
+<file path="src/main/java/mx/ipn/upiicsa/web/ejemplo03/App.java">
+package mx.ipn.upiicsa.web.ejemplo03;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication // 👈 ¡Esta anotación es obligatoria!
+public class App {
+
+    public static void main(String[] args) {
+        SpringApplication.run(App.class, args);
+    }
+}
+</file>
+
+<file path="src/main/resources/templates/contacts/media/create.html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Agregar Medio')}">
+</head>
+
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/contacts}" class="text-brand text-decoration-none">Contactos</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/contacts/{id}/media(id=${idContact})}"
+                           class="text-brand text-decoration-none">Medios</a>
+                    </li>
+                    <li class="breadcrumb-item active">Agregar</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-plus-circle-fill me-2"></i>Agregar Medio de Contacto</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/contacts/{id}/media(id=${idContact})}"
+                          th:object="${registerContactMediumDto}"
+                          method="POST">
+
+                        <!-- Tipo -->
+                        <div class="mb-4">
+                            <label for="idType" class="form-label">
+                                <i class="bi bi-tag text-brand me-1"></i>Tipo de Medio *
+                            </label>
+                            <select id="idType"
+                                    th:field="*{idType}"
+                                    class="form-select"
+                                    th:classappend="${#fields.hasErrors('idType')} ? ' is-invalid'"
+                                    required>
+                                <option value="" disabled selected>— Selecciona un tipo —</option>
+                                <option th:each="t : ${types}"
+                                        th:value="${t.id}"
+                                        th:text="${t.name}">Tipo</option>
+                            </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('idType')}"
+                                 th:errors="*{idType}"></div>
+                        </div>
+
+                        <!-- Valor -->
+                        <div class="mb-4">
+                            <label for="value" class="form-label">
+                                <i class="bi bi-input-cursor-text text-brand me-1"></i>Valor *
+                            </label>
+                            <input type="text" id="value"
+                                   th:field="*{value}"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('value')} ? ' is-invalid'"
+                                   placeholder="ej. correo@email.com ó 5512345678"/>
+                            <div class="form-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Ingresa un correo válido o un número de 10 dígitos.
+                            </div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('value')}"
+                                 th:errors="*{value}"></div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-brand px-4">
+                                <i class="bi bi-floppy me-2"></i>Guardar Medio
+                            </button>
+                            <a th:href="@{/contacts/{id}/media(id=${idContact})}"
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/contacts/media/edit.html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Editar Medio')}">
+</head>
+
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/contacts}" class="text-brand text-decoration-none">Contactos</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/contacts/{id}/media(id=${idContact})}"
+                           class="text-brand text-decoration-none">Medios</a>
+                    </li>
+                    <li class="breadcrumb-item active">Editar</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-pencil-square me-2"></i>Editar Medio de Contacto</h5>
+                </div>
+                <div class="card-body p-4">
+                    <!--
+                        PUT via hidden _method.
+                        El id del medio se toma del DTO (puesto en modelo por el controlador),
+                        que es el mismo valor que el path variable. Se usa para construir la URL.
+                    -->
+                    <form th:action="@{/contacts/{ic}/media/{id}(ic=${idContact},id=${updateContactMediumDto.id})}"
+                          th:object="${updateContactMediumDto}"
+                          method="POST">
+                        <input type="hidden" name="_method" value="PUT"/>
+
+                        <!-- Tipo -->
+                        <div class="mb-4">
+                            <label for="idType" class="form-label">
+                                <i class="bi bi-tag text-brand me-1"></i>Tipo de Medio *
+                            </label>
+                            <select id="idType"
+                                    th:field="*{idType}"
+                                    class="form-select"
+                                    required>
+                                <option value="" disabled>— Selecciona un tipo —</option>
+                                <option th:each="t : ${types}"
+                                        th:value="${t.id}"
+                                        th:text="${t.name}">Tipo</option>
+                            </select>
+                        </div>
+
+                        <!-- Valor -->
+                        <div class="mb-4">
+                            <label for="value" class="form-label">
+                                <i class="bi bi-input-cursor-text text-brand me-1"></i>Valor *
+                            </label>
+                            <input type="text" id="value"
+                                   th:field="*{value}"
+                                   class="form-control"
+                                   placeholder="ej. correo@email.com ó 5512345678"/>
+                            <div class="form-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Ingresa un correo válido o un número de 10 dígitos.
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-brand px-4">
+                                <i class="bi bi-floppy me-2"></i>Guardar Cambios
+                            </button>
+                            <a th:href="@{/contacts/{id}/media(id=${idContact})}"
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/contacts/media/index.html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Medios de Contacto')}">
+</head>
+
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 page-header">
+        <div>
+            <h3>
+                <i class="bi bi-telephone-inbound-fill text-brand me-2"></i>Medios de Contacto
+            </h3>
+            <p>
+                Contacto
+                <span class="chip chip-blue" th:text="'#' + ${idContact}">—</span>
+            </p>
+        </div>
+        <a th:href="@{/contacts/{id}/media/create(id=${idContact})}" class="btn btn-brand">
+            <i class="bi bi-plus-circle-fill me-2"></i>Agregar Medio
+        </a>
+    </div>
+
+    <!-- Tabla de medios -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th class="ps-4" style="width:40%;">Tipo</th>
+                        <th>Valor / Cuenta</th>
+                        <th class="text-center pe-4" style="width:130px;">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <!-- Sin medios -->
+                    <tr th:if="${#lists.isEmpty(mediaList)}">
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <i class="bi bi-telephone-x"></i>
+                                <strong class="d-block mb-1">Sin medios registrados</strong>
+                                <span class="small">Agrega correos, teléfonos o redes sociales.</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Filas -->
+                    <tr th:each="media : ${mediaList}">
+                        <td class="ps-4">
+                            <th:block th:switch="${media.idType}">
+                                <span th:case="1" class="chip chip-blue">
+                                    <i class="bi bi-envelope-fill"></i> Correo Electrónico
+                                </span>
+                                <span th:case="2" class="chip chip-green">
+                                    <i class="bi bi-telephone-fill"></i> Número Telefónico
+                                </span>
+                                <span th:case="3" class="chip chip-purple">
+                                    <i class="bi bi-instagram"></i> Instagram
+                                </span>
+                                <span th:case="*" class="chip chip-gray">
+                                    <i class="bi bi-chat-dots"></i>
+                                    Tipo <span th:text="${media.idType}"></span>
+                                </span>
+                            </th:block>
+                        </td>
+                        <td class="fw-semibold" th:text="${media.value}">valor</td>
+                        <td class="text-center pe-4">
+                            <div class="d-flex justify-content-center gap-2">
+                                <!-- Editar -->
+                                <a th:href="@{/contacts/{ic}/media/{id}/edit(ic=${idContact},id=${media.id})}"
+                                   class="btn btn-sm btn-outline-secondary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <!-- Eliminar -->
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger js-delete-media"
+                                        th:attr="data-form='del-m-' + ${media.id},
+                                                 data-val=${media.value}">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                                <form th:id="'del-m-' + ${media.id}"
+                                      th:action="@{/contacts/{ic}/media/{id}(ic=${idContact},id=${media.id})}"
+                                      method="POST" style="display:none;">
+                                    <input type="hidden" name="_method" value="DELETE"/>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a th:href="@{/contacts}" class="text-muted small">
+            <i class="bi bi-arrow-left me-1"></i>Volver a Contactos
+        </a>
+    </div>
+</main>
+
+<!-- SweetAlert2 ya está en <head> via layout -->
+<script>
+    document.querySelectorAll('.js-delete-media').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var formId = this.getAttribute('data-form');
+            var val    = this.getAttribute('data-val');
+            Swal.fire({
+                title: '¿Eliminar medio?',
+                html: 'Se eliminará el registro: <strong>' + val + '</strong>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="bi bi-trash3 me-1"></i>Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                customClass: { popup: 'rounded-3', confirmButton: 'btn btn-sm', cancelButton: 'btn btn-sm btn-secondary' },
+                buttonsStyling: false
+            }).then(function(r) {
+                if (r.isConfirmed) document.getElementById(formId).submit();
+            });
+        });
+    });
+</script>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/contacts/destroy.html">
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - Mi Proyecto MVC</title>
+</head>
+<body>
+<h1>Editar usuario</h1>
+
+<!-- Thymeleaf reemplaza este texto con el valor de la variable 'mensaje' -->
+
+<form th:action="@{/contacts/{id}(id=${id})}" th:object="${contactDto}" method="POST" th:method="DELETE">
+    <div>
+        <label>Nombre:</label>
+        <span th:text="*{name}" />
+    </div>
+    <div>
+        <label>Primer apellido:</label>
+        <span th:text="*{lastName}" />
+    </div>
+    <div>
+        <label>Segundo apellido:</label>
+        <span th:text="*{secondLastName}" />
+    </div>
+    <div>
+        <label>Apodo:</label>
+        <span th:text="*{nickname}" />
+    </div>
+    <br>
+    <button type="submit">Eliminar</button>
+</form>
+<a th:href="@{/contacts}">Regresar</a>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/contacts/edit.html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Editar Contacto')}">
+</head>
+
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/contacts}" class="text-brand text-decoration-none">
+                            <i class="bi bi-people me-1"></i>Mis Contactos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">Editar Contacto</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-pencil-square me-2"></i>Editar Contacto</h5>
+                </div>
+                <div class="card-body p-4">
+                    <!--
+                        PUT a través del hidden _method.
+                        Spring lo intercepta via HiddenHttpMethodFilter
+                        (ya activo con spring.mvc.hiddenmethod.filter.enabled=true).
+                        El ${id} viene del controlador: model.addAttribute("id", ...)
+                    -->
+                    <form th:action="@{/contacts/{id}(id=${id})}"
+                          th:object="${contactDto}"
+                          method="POST">
+                        <input type="hidden" name="_method" value="PUT"/>
+
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">
+                                <i class="bi bi-person text-brand me-1"></i>Nombre *
+                            </label>
+                            <input type="text" id="name"
+                                   th:field="*{name}"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('name')} ? ' is-invalid'"
+                                   placeholder="ej. Ana"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}"
+                                 th:errors="*{name}"></div>
+                        </div>
+
+                        <!-- Apellidos -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label for="lastName" class="form-label">Primer Apellido *</label>
+                                <input type="text" id="lastName"
+                                       th:field="*{lastName}"
+                                       class="form-control"
+                                       th:classappend="${#fields.hasErrors('lastName')} ? ' is-invalid'"
+                                       placeholder="ej. Martínez"/>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}"
+                                     th:errors="*{lastName}"></div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="secondLastName" class="form-label">
+                                    Segundo Apellido <span class="text-muted fw-normal">(opcional)</span>
+                                </label>
+                                <input type="text" id="secondLastName"
+                                       th:field="*{secondLastName}"
+                                       class="form-control"
+                                       placeholder="ej. Ruiz"/>
+                            </div>
+                        </div>
+
+                        <!-- Apodo -->
+                        <div class="mb-4">
+                            <label for="nickname" class="form-label">
+                                <i class="bi bi-tag text-brand me-1"></i>Apodo / Nickname *
+                            </label>
+                            <input type="text" id="nickname"
+                                   th:field="*{nickname}"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('nickname')} ? ' is-invalid'"
+                                   placeholder="ej. Anita"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('nickname')}"
+                                 th:errors="*{nickname}"></div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-brand px-4">
+                                <i class="bi bi-floppy me-2"></i>Guardar Cambios
+                            </button>
+                            <a th:href="@{/contacts}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/contacts/index.html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Mis Contactos')}">
+</head>
+
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 page-header">
+        <div>
+            <h3><i class="bi bi-people-fill text-brand me-2"></i>Mis Contactos</h3>
+            <p>Gestiona tu agenda personal de contactos</p>
+        </div>
+        <a th:href="@{/contacts/newContact}" class="btn btn-brand">
+            <i class="bi bi-person-plus-fill me-2"></i>Nuevo Contacto
+        </a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th class="ps-4">Nombre completo</th>
+                        <th class="d-none d-md-table-cell">Apodo</th>
+                        <th class="text-center pe-4" style="width:200px;">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <!-- Sin contactos -->
+                    <tr th:if="${#lists.isEmpty(contacts)}">
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <i class="bi bi-people"></i>
+                                <strong class="d-block mb-1">Sin contactos aún</strong>
+                                <span class="small">Agrega tu primer contacto con el botón de arriba.</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Filas -->
+                    <tr th:each="contact : ${contacts}">
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <!-- Avatar generado con inicial -->
+                                <div class="avatar bg-brand text-white" style="width:38px;height:38px;flex-shrink:0;">
+                                    <span th:text="${#strings.substring(contact.name,0,1).toUpperCase()}">A</span>
+                                </div>
+                                <div>
+                                    <div class="fw-semibold lh-sm"
+                                         th:text="${contact.name + ' ' + contact.lastName}">Nombre</div>
+                                    <div class="text-muted small"
+                                         th:text="${contact.secondLastName ?: ''}"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="d-none d-md-table-cell">
+                            <span class="chip chip-blue" th:text="${contact.nickname}">apodo</span>
+                        </td>
+                        <td class="text-center pe-4">
+                            <div class="d-flex justify-content-center gap-2">
+                                <!-- Medios -->
+                                <a th:href="@{/contacts/{id}/media(id=${contact.id})}"
+                                   class="btn btn-sm btn-outline-brand" title="Ver medios de contacto">
+                                    <i class="bi bi-telephone-inbound"></i>
+                                </a>
+                                <!-- Editar -->
+                                <a th:href="@{/contacts/{id}/edit(id=${contact.id})}"
+                                   class="btn btn-sm btn-outline-secondary" title="Editar contacto">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <!-- Eliminar -->
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger js-delete"
+                                        th:attr="data-form='del-c-' + ${contact.id},
+                                                 data-name=${contact.name + ' ' + contact.lastName}">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                                <form th:id="'del-c-' + ${contact.id}"
+                                      th:action="@{/contacts/{id}(id=${contact.id})}"
+                                      method="POST" style="display:none;">
+                                    <input type="hidden" name="_method" value="DELETE"/>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a th:href="@{/welcome}" class="text-muted small">
+            <i class="bi bi-arrow-left me-1"></i>Volver al inicio
+        </a>
+    </div>
+</main>
+
+<!-- SweetAlert2 delete (SweetAlert2 ya está en <head> via layout) -->
+<script>
+    document.querySelectorAll('.js-delete').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var formId = this.getAttribute('data-form');
+            var name   = this.getAttribute('data-name');
+            Swal.fire({
+                title: '¿Eliminar contacto?',
+                html: 'Se eliminará a <strong>' + name + '</strong> y todos sus medios de contacto.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="bi bi-trash3 me-1"></i>Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                customClass: { popup: 'rounded-3', confirmButton: 'btn btn-sm', cancelButton: 'btn btn-sm btn-secondary' },
+                buttonsStyling: false
+            }).then(function(r) {
+                if (r.isConfirmed) document.getElementById(formId).submit();
+            });
+        });
+    });
+</script>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/contacts/newContact.html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Nuevo Contacto')}">
+</head>
+
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/contacts}" class="text-brand text-decoration-none">
+                            <i class="bi bi-people me-1"></i>Mis Contactos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">Nuevo Contacto</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-person-plus-fill me-2"></i>Registrar Nuevo Contacto</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="@{/contacts}" th:object="${registerContactDto}" method="POST">
+
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">
+                                <i class="bi bi-person text-brand me-1"></i>Nombre *
+                            </label>
+                            <input type="text" id="name"
+                                   th:field="*{name}"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('name')} ? ' is-invalid'"
+                                   placeholder="ej. Ana"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}"
+                                 th:errors="*{name}"></div>
+                        </div>
+
+                        <!-- Apellidos -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label for="lastName" class="form-label">Primer Apellido *</label>
+                                <input type="text" id="lastName"
+                                       th:field="*{lastName}"
+                                       class="form-control"
+                                       th:classappend="${#fields.hasErrors('lastName')} ? ' is-invalid'"
+                                       placeholder="ej. Martínez"/>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}"
+                                     th:errors="*{lastName}"></div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="secondLastName" class="form-label">
+                                    Segundo Apellido <span class="text-muted fw-normal">(opcional)</span>
+                                </label>
+                                <input type="text" id="secondLastName"
+                                       th:field="*{secondLastName}"
+                                       class="form-control"
+                                       placeholder="ej. Ruiz"/>
+                            </div>
+                        </div>
+
+                        <!-- Apodo -->
+                        <div class="mb-4">
+                            <label for="nickname" class="form-label">
+                                <i class="bi bi-tag text-brand me-1"></i>Apodo / Nickname *
+                            </label>
+                            <input type="text" id="nickname"
+                                   th:field="*{nickname}"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('nickname')} ? ' is-invalid'"
+                                   placeholder="ej. Anita"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('nickname')}"
+                                 th:errors="*{nickname}"></div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-brand px-4">
+                                <i class="bi bi-floppy me-2"></i>Guardar Contacto
+                            </button>
+                            <a th:href="@{/contacts}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/fragments/layout.html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  FRAGMENT: head(pageTitle)                                   ║
+  ║  Uso: <head th:replace="~{fragments/layout :: head('Título')}">  ║
+  ║  Incluye: Bootstrap 5 CSS · Bootstrap Icons · SweetAlert2   ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+<head th:fragment="head(pageTitle)">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${pageTitle} + ' — Agenda Web'">Agenda Web</title>
+
+    <!-- ① Bootstrap 5.3 CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+
+    <!-- ② Bootstrap Icons 1.11 -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+
+    <!-- ③ SweetAlert2 — va en <head> para estar disponible en scripts de confirmación -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+    <!-- ④ Estilos personalizados -->
+    <style>
+        /* ── Variables ─────────────────────────────── */
+        :root {
+            --brand:        #2563eb;   /* Blue-600  */
+            --brand-dark:   #1d4ed8;   /* Blue-700  */
+            --brand-light:  #dbeafe;   /* Blue-100  */
+            --surface:      #f8fafc;   /* Slate-50  */
+            --card-shadow:  0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(37,99,235,.06);
+            --nav-bg:       #0f172a;   /* Slate-900 */
+            --text:         #0f172a;
+            --muted:        #64748b;
+        }
+
+        /* ── Base ───────────────────────────────────── */
+        body {
+            background-color: var(--surface);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main { flex: 1; }
+
+        /* ── Navbar ─────────────────────────────────── */
+        .app-navbar {
+            background-color: var(--nav-bg);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        .app-navbar .navbar-brand {
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: -.3px;
+            color: #fff !important;
+        }
+        .app-navbar .nav-link {
+            color: rgba(255,255,255,.65) !important;
+            font-size: .875rem;
+            font-weight: 500;
+            padding: .5rem .75rem;
+            border-radius: 6px;
+            transition: color .15s, background .15s;
+        }
+        .app-navbar .nav-link:hover,
+        .app-navbar .nav-link.active {
+            color: #fff !important;
+            background-color: rgba(255,255,255,.08);
+        }
+        .app-navbar .nav-divider {
+            width: 1px; height: 20px;
+            background: rgba(255,255,255,.15);
+            align-self: center;
+        }
+
+        /* ── Cards ──────────────────────────────────── */
+        .card {
+            border: 1px solid rgba(0,0,0,.06);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+        .card-header {
+            background-color: var(--brand) !important;
+            color: #fff;
+            border-radius: 11px 11px 0 0 !important;
+            border-bottom: none;
+            padding: 1rem 1.25rem;
+        }
+        .card-header h5, .card-header h6 { margin-bottom: 0; font-weight: 600; }
+
+        /* ── Buttons ─────────────────────────────────── */
+        .btn { border-radius: 8px; font-weight: 500; }
+        .btn-brand {
+            background-color: var(--brand);
+            border-color: var(--brand);
+            color: #fff;
+        }
+        .btn-brand:hover, .btn-brand:focus {
+            background-color: var(--brand-dark);
+            border-color: var(--brand-dark);
+            color: #fff;
+        }
+        .btn-outline-brand {
+            border-color: var(--brand);
+            color: var(--brand);
+        }
+        .btn-outline-brand:hover {
+            background-color: var(--brand);
+            color: #fff;
+        }
+
+        /* ── Tables ──────────────────────────────────── */
+        .table thead th {
+            font-size: .75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: var(--muted);
+            background-color: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: .875rem 1rem;
+        }
+        .table tbody td {
+            vertical-align: middle;
+            padding: .875rem 1rem;
+            border-color: #f1f5f9;
+        }
+        .table-hover tbody tr:hover { background-color: #eff6ff; }
+
+        /* ── Form controls ───────────────────────────── */
+        .form-control, .form-select {
+            border-color: #e2e8f0;
+            border-radius: 8px;
+            font-size: .9rem;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+        }
+        .form-label { font-weight: 500; font-size: .875rem; margin-bottom: .375rem; }
+
+        /* ── Badges / Chips ──────────────────────────── */
+        .chip {
+            display: inline-flex; align-items: center; gap: .35rem;
+            padding: .25rem .65rem;
+            border-radius: 9999px;
+            font-size: .78rem;
+            font-weight: 500;
+        }
+        .chip-blue   { background: var(--brand-light); color: var(--brand-dark); }
+        .chip-green  { background: #dcfce7; color: #166534; }
+        .chip-red    { background: #fee2e2; color: #991b1b; }
+        .chip-purple { background: #ede9fe; color: #6d28d9; }
+        .chip-gray   { background: #f1f5f9; color: #475569; }
+
+        /* ── Footer ──────────────────────────────────── */
+        .app-footer {
+            background-color: #fff;
+            border-top: 1px solid #e2e8f0;
+            padding: .875rem 0;
+            font-size: .8rem;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        /* ── Utilities ───────────────────────────────── */
+        .text-brand  { color: var(--brand) !important; }
+        .bg-brand    { background-color: var(--brand) !important; }
+        .avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .85rem;
+        }
+        .page-header { margin-bottom: 1.75rem; }
+        .page-header h3 { font-weight: 700; margin-bottom: .2rem; }
+        .page-header p  { color: var(--muted); font-size: .875rem; margin: 0; }
+        .empty-state { padding: 3.5rem 1rem; text-align: center; color: var(--muted); }
+        .empty-state i { font-size: 2.5rem; opacity: .3; display: block; margin-bottom: .75rem; }
+    </style>
+</head>
+
+<body>
+
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  FRAGMENT: navbar                                            ║
+  ║  Uso: <div th:replace="~{fragments/layout :: navbar}"></div> ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg app-navbar">
+    <div class="container">
+        <!-- Brand -->
+        <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/welcome}">
+            <i class="bi bi-journal-bookmark-fill" style="color:#60a5fa;"></i>
+            Agenda Web
+        </a>
+
+        <!-- Toggler (mobile) -->
+        <button class="navbar-toggler border-0 text-white" type="button"
+                data-bs-toggle="collapse" data-bs-target="#appNav">
+            <i class="bi bi-list fs-5"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="appNav">
+            <!-- Links -->
+            <ul class="navbar-nav me-auto gap-1 mt-2 mt-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/welcome}">
+                        <i class="bi bi-house me-1"></i>Inicio
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/contacts}">
+                        <i class="bi bi-people me-1"></i>Mis Contactos
+                    </a>
+                </li>
+                <li class="nav-item" th:if="${session.usuarioSesion != null}">
+                    <a class="nav-link"
+                       th:href="@{/users/{id}/edit(id=${session.usuarioSesion.id})}">
+                        <i class="bi bi-person-gear me-1"></i>Mi Perfil
+                    </a>
+                </li>
+            </ul>
+
+            <!-- User info + logout -->
+            <div class="d-flex align-items-center gap-3 mt-2 mt-lg-0"
+                 th:if="${session.usuarioSesion != null}">
+                <div class="nav-divider d-none d-lg-block"></div>
+                <!-- Avatar chip -->
+                <div class="d-flex align-items-center gap-2">
+                    <div class="avatar bg-brand text-white">
+                        <span th:text="${#strings.substring(session.usuarioSesion.username, 0, 1).toUpperCase()}">U</span>
+                    </div>
+                    <span class="text-white-50 small d-none d-md-inline"
+                          th:text="${session.usuarioSesion.username}">usuario</span>
+                </div>
+                <!-- Logout -->
+                <a th:href="@{/logout}"
+                   class="btn btn-sm px-3 text-white border-white-25"
+                   style="border: 1px solid rgba(255,255,255,.25); border-radius:8px; font-size:.8rem;">
+                    <i class="bi bi-box-arrow-right me-1"></i>Salir
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  FRAGMENT: footer                                            ║
+  ║  Uso: <div th:replace="~{fragments/layout :: footer}"></div> ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+<footer th:fragment="footer" class="app-footer">
+    <div class="container">
+        <i class="bi bi-journal-bookmark-fill me-1 text-brand"></i>
+        Agenda Web &copy; 2024 &mdash; IPN UPIICSA
+    </div>
+</footer>
+
+<!--
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  FRAGMENT: scripts                                                   ║
+  ║  Uso: <th:block th:replace="~{fragments/layout :: scripts}">        ║
+  ║  Incluye: Bootstrap 5 JS + Toast automático de Flash Attributes     ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+-->
+<th:block th:fragment="scripts">
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!--
+        Toast automático de Flash Attributes.
+        th:inline="javascript" permite leer variables del modelo de Spring directamente.
+        Thymeleaf renderiza null cuando la variable no existe → la condición 'if' la descarta.
+    -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function () {
+            var msgSuccess = /*[[${messageConfirmacion}]]*/ null;
+            var msgInfo    = /*[[${message}]]*/ null;
+            var msgError   = /*[[${messageError}]]*/ null;
+
+            function swalToast(icon, title) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: icon,
+                    title: title,
+                    showConfirmButton: false,
+                    timer: 3800,
+                    timerProgressBar: true
+                });
+            }
+
+            if (msgSuccess) swalToast('success', msgSuccess);
+            if (msgInfo)    swalToast('success', msgInfo);
+            if (msgError)   swalToast('error', msgError);
+        })();
+        /*]]>*/
+    </script>
+</th:block>
+
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/register/new.html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Crear Cuenta')}">
+</head>
+
+<body style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1e40af 100%); min-height:100vh;">
+
+<div class="d-flex align-items-center justify-content-center min-vh-100 py-5 px-3">
+    <div style="width:100%; max-width:500px;">
+
+        <!-- Brand -->
+        <div class="text-center mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white mb-3"
+                 style="width:64px; height:64px; box-shadow: 0 8px 24px rgba(0,0,0,.3);">
+                <i class="bi bi-person-plus-fill fs-3 text-brand"></i>
+            </div>
+            <h1 class="text-white fw-bold fs-3 mb-1">Crear Cuenta</h1>
+            <p class="text-white-50 small mb-0">Completa el formulario para registrarte</p>
+        </div>
+
+        <!-- Card -->
+        <div class="card p-4 p-sm-5">
+            <h5 class="fw-bold mb-1">Datos de Registro</h5>
+            <p class="text-muted small mb-4">Todos los campos marcados con * son obligatorios</p>
+
+            <form th:action="@{/register}" th:object="${registerUserDto}" method="POST">
+
+                <!-- Nombre -->
+                <div class="mb-3">
+                    <label for="name" class="form-label">
+                        <i class="bi bi-person text-brand me-1"></i>Nombre *
+                    </label>
+                    <input type="text" id="name"
+                           th:field="*{name}"
+                           class="form-control"
+                           th:classappend="${#fields.hasErrors('name')} ? ' is-invalid'"
+                           placeholder="ej. María"/>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}"
+                         th:errors="*{name}"></div>
+                </div>
+
+                <!-- Apellidos -->
+                <div class="row g-3 mb-3">
+                    <div class="col-sm-6">
+                        <label for="lastName" class="form-label">Primer Apellido *</label>
+                        <input type="text" id="lastName"
+                               th:field="*{lastName}"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('lastName')} ? ' is-invalid'"
+                               placeholder="ej. García"/>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}"
+                             th:errors="*{lastName}"></div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="secondLastName" class="form-label">
+                            Segundo Apellido <span class="text-muted fw-normal">(opcional)</span>
+                        </label>
+                        <input type="text" id="secondLastName"
+                               th:field="*{secondLastName}"
+                               class="form-control"
+                               placeholder="ej. López"/>
+                    </div>
+                </div>
+
+                <hr class="my-4"/>
+
+                <!-- Username -->
+                <div class="mb-3">
+                    <label for="username" class="form-label">
+                        <i class="bi bi-at text-brand me-1"></i>Nombre de Usuario *
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted">
+                            <i class="bi bi-at"></i>
+                        </span>
+                        <input type="text" id="username"
+                               th:field="*{username}"
+                               class="form-control border-start-0"
+                               th:classappend="${#fields.hasErrors('username')} ? ' is-invalid'"
+                               placeholder="mi_usuario"
+                               autocomplete="username"/>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}"
+                             th:errors="*{username}"></div>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-4">
+                    <label for="password" class="form-label">
+                        <i class="bi bi-shield-lock text-brand me-1"></i>Contraseña *
+                    </label>
+                    <input type="password" id="password"
+                           th:field="*{password}"
+                           class="form-control"
+                           th:classappend="${#fields.hasErrors('password')} ? ' is-invalid'"
+                           placeholder="Mínimo 6 caracteres"
+                           autocomplete="new-password"/>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}"
+                         th:errors="*{password}"></div>
+                </div>
+
+                <button type="submit" class="btn btn-brand w-100 py-2 fw-semibold">
+                    <i class="bi bi-person-check me-2"></i>Crear Cuenta
+                </button>
+            </form>
+
+            <hr class="my-4"/>
+
+            <p class="text-center text-muted small mb-0">
+                ¿Ya tienes cuenta?
+                <a th:href="@{/}" class="fw-semibold text-brand">Inicia sesión</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/users/destroy.html">
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - Mi Proyecto MVC</title>
+</head>
+<body>
+<h1>Eliminar usuario</h1>
+
+<!-- Thymeleaf reemplaza este texto con el valor de la variable 'mensaje' -->
+
+<form th:action="@{/users/{id}(id=${id})}" th:object="${userDto}" method="POST" th:method="DELETE">
+    <div>
+        <label>Nombre:</label>
+        <span th:text="*{name}" />
+    </div>
+    <div>
+        <label>Primer apellido:</label>
+        <span th:text="*{lastName}" />
+    </div>
+    <div>
+        <label>Segundo apellido:</label>
+        <span th:text="*{secondLastName}" />
+    </div>
+    <div>
+        <label>Usuario:</label>
+        <span th:text="*{username}" />
+    </div>
+    <br>
+    <button type="submit">Enviar</button>
+</form>
+<a th:href="@{/users}">Regresar</a>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/users/edit.html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Editar Perfil')}">
+</head>
+
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/users}" class="text-brand text-decoration-none">
+                            <i class="bi bi-people me-1"></i>Usuarios
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">Editar Perfil</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-person-fill-gear me-2"></i>Editar Perfil de Usuario</h5>
+                </div>
+                <div class="card-body p-4">
+                    <!--
+                        PUT via hidden _method.
+                        El ${id} viene del controlador: model.addAttribute("id", ...).
+                        El DTO es UpdateUserDto (sin campo password).
+                    -->
+                    <form th:action="@{/users/{id}(id=${id})}"
+                          th:object="${userDto}"
+                          method="POST">
+                        <input type="hidden" name="_method" value="PUT"/>
+
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">
+                                <i class="bi bi-person text-brand me-1"></i>Nombre *
+                            </label>
+                            <input type="text" id="name"
+                                   th:field="*{name}"
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('name')} ? ' is-invalid'"
+                                   placeholder="ej. María"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}"
+                                 th:errors="*{name}"></div>
+                        </div>
+
+                        <!-- Apellidos -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label for="lastName" class="form-label">Primer Apellido *</label>
+                                <input type="text" id="lastName"
+                                       th:field="*{lastName}"
+                                       class="form-control"
+                                       th:classappend="${#fields.hasErrors('lastName')} ? ' is-invalid'"
+                                       placeholder="ej. García"/>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}"
+                                     th:errors="*{lastName}"></div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="secondLastName" class="form-label">
+                                    Segundo Apellido <span class="text-muted fw-normal">(opcional)</span>
+                                </label>
+                                <input type="text" id="secondLastName"
+                                       th:field="*{secondLastName}"
+                                       class="form-control"
+                                       placeholder="ej. López"/>
+                            </div>
+                        </div>
+
+                        <!-- Username -->
+                        <div class="mb-4">
+                            <label for="username" class="form-label">
+                                <i class="bi bi-at text-brand me-1"></i>Nombre de Usuario *
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted border-end-0">
+                                    <i class="bi bi-at"></i>
+                                </span>
+                                <input type="text" id="username"
+                                       th:field="*{username}"
+                                       class="form-control border-start-0"
+                                       th:classappend="${#fields.hasErrors('username')} ? ' is-invalid'"
+                                       placeholder="mi_usuario"
+                                       autocomplete="username"/>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}"
+                                     th:errors="*{username}"></div>
+                            </div>
+                        </div>
+
+                        <!-- Info: no se edita contraseña -->
+                        <div class="alert alert-light border d-flex gap-2 align-items-start py-2 mb-4" role="alert">
+                            <i class="bi bi-info-circle-fill text-brand mt-1 flex-shrink-0"></i>
+                            <small class="text-muted">
+                                La contraseña no se puede modificar desde aquí.
+                                Contacta al administrador si necesitas cambiarla.
+                            </small>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-brand px-4">
+                                <i class="bi bi-floppy me-2"></i>Guardar Cambios
+                            </button>
+                            <a th:href="@{/users}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/users/index.html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Usuarios')}">
+</head>
+
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 page-header">
+        <div>
+            <h3><i class="bi bi-person-lines-fill text-brand me-2"></i>Usuarios del Sistema</h3>
+            <p>Listado de todas las cuentas registradas</p>
+        </div>
+        <a th:href="@{/register/new}" class="btn btn-brand">
+            <i class="bi bi-person-plus-fill me-2"></i>Nuevo Usuario
+        </a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th class="ps-4">Usuario</th>
+                        <th class="d-none d-md-table-cell">Apellidos</th>
+                        <th class="text-center pe-4" style="width:130px;">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <!-- Sin usuarios -->
+                    <tr th:if="${#lists.isEmpty(personas)}">
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <i class="bi bi-people"></i>
+                                <strong class="d-block mb-1">Sin usuarios</strong>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Filas -->
+                    <tr th:each="persona : ${personas}">
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar text-white" style="width:38px;height:38px;flex-shrink:0;background:#7c3aed;">
+                                    <span th:text="${#strings.substring(persona.username,0,1).toUpperCase()}">U</span>
+                                </div>
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="fw-semibold" th:text="${persona.username}">usuario</span>
+                                        <!-- Badge: usuario en sesión -->
+                                        <span th:if="${session.usuarioSesion != null and session.usuarioSesion.id == persona.id}"
+                                              class="chip chip-blue" style="font-size:.7rem;">
+                                            <i class="bi bi-person-check-fill"></i> Tú
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small" th:text="${persona.name}">nombre</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="d-none d-md-table-cell text-muted"
+                            th:text="${persona.lastName + (persona.secondLastName != null ? ' ' + persona.secondLastName : '')}">
+                            Apellidos
+                        </td>
+                        <td class="text-center pe-4">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a th:href="@{/users/{id}/edit(id=${persona.id})}"
+                                   class="btn btn-sm btn-outline-secondary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger js-delete-user"
+                                        th:attr="data-form='del-u-' + ${persona.id},
+                                                 data-username=${persona.username}">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                                <form th:id="'del-u-' + ${persona.id}"
+                                      th:action="@{/users/{id}(id=${persona.id})}"
+                                      method="POST" style="display:none;">
+                                    <input type="hidden" name="_method" value="DELETE"/>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a th:href="@{/welcome}" class="text-muted small">
+            <i class="bi bi-arrow-left me-1"></i>Volver al inicio
+        </a>
+    </div>
+</main>
+
+<script>
+    document.querySelectorAll('.js-delete-user').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var formId   = this.getAttribute('data-form');
+            var username = this.getAttribute('data-username');
+            Swal.fire({
+                title: '¿Eliminar usuario?',
+                html: 'Se eliminará la cuenta de <strong>@' + username + '</strong>. Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="bi bi-trash3 me-1"></i>Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                customClass: { popup: 'rounded-3', confirmButton: 'btn btn-sm', cancelButton: 'btn btn-sm btn-secondary' },
+                buttonsStyling: false
+            }).then(function(r) {
+                if (r.isConfirmed) document.getElementById(formId).submit();
+            });
+        });
+    });
+</script>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/index.html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Iniciar Sesión')}">
+    <!-- Bootstrap, Icons y SweetAlert2 se cargan desde el fragmento -->
+</head>
+
+<body style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1e40af 100%); min-height:100vh;">
+
+<div class="d-flex align-items-center justify-content-center min-vh-100 py-5 px-3">
+    <div style="width:100%; max-width:420px;">
+
+        <!-- Logo / Brand -->
+        <div class="text-center mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white mb-3"
+                 style="width:64px; height:64px; box-shadow: 0 8px 24px rgba(0,0,0,.3);">
+                <i class="bi bi-journal-bookmark-fill fs-3 text-brand"></i>
+            </div>
+            <h1 class="text-white fw-bold fs-3 mb-1">Agenda Web</h1>
+            <p class="text-white-50 small mb-0">IPN · UPIICSA · Desarrollo Web</p>
+        </div>
+
+        <!-- Card login -->
+        <div class="card p-4 p-sm-5">
+            <h5 class="fw-bold mb-1">Bienvenido 👋</h5>
+            <p class="text-muted small mb-4">Ingresa tus credenciales para continuar</p>
+
+            <form th:action="@{/}" th:object="${usuarioDto}" method="POST">
+
+                <!-- Usuario -->
+                <div class="mb-3">
+                    <label for="username" class="form-label">
+                        <i class="bi bi-person text-brand me-1"></i>Usuario
+                    </label>
+                    <input type="text" id="username"
+                           th:field="*{username}"
+                           class="form-control form-control-lg"
+                           th:classappend="${#fields.hasErrors('username')} ? ' is-invalid'"
+                           placeholder="tu_usuario"
+                           autocomplete="username" autofocus/>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}"
+                         th:errors="*{username}"></div>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="mb-4">
+                    <label for="password" class="form-label">
+                        <i class="bi bi-lock text-brand me-1"></i>Contraseña
+                    </label>
+                    <input type="password" id="password"
+                           th:field="*{password}"
+                           class="form-control form-control-lg"
+                           th:classappend="${#fields.hasErrors('password')} ? ' is-invalid'"
+                           placeholder="••••••••"
+                           autocomplete="current-password"/>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}"
+                         th:errors="*{password}"></div>
+                </div>
+
+                <button type="submit" class="btn btn-brand w-100 py-2 fw-semibold fs-6">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                </button>
+            </form>
+
+            <hr class="my-4"/>
+
+            <p class="text-center text-muted small mb-0">
+                ¿No tienes cuenta?
+                <a th:href="@{/register/new}" class="fw-semibold text-brand">Regístrate aquí</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/templates/welcome.html">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Inicio')}" >
+</head>
+
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="container py-5">
+
+    <!-- Saludo -->
+    <div class="page-header">
+        <h3>
+            Hola,
+            <span class="text-brand" th:text="${session.usuarioSesion.username}">usuario</span> 👋
+        </h3>
+        <p>¿Qué quieres hacer hoy?</p>
+    </div>
+
+    <!-- Tarjetas de acceso rápido -->
+    <div class="row g-4">
+
+        <!-- Mis Contactos -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 p-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="avatar bg-brand text-white" style="width:48px;height:48px;font-size:1.3rem;">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Mis Contactos</h6>
+                        <span class="text-muted small">Agenda personal</span>
+                    </div>
+                </div>
+                <p class="text-muted small mb-4">
+                    Gestiona tu lista de contactos: agrégalos, edítalos y organiza sus medios de comunicación.
+                </p>
+                <a th:href="@{/contacts}" class="btn btn-brand mt-auto">
+                    <i class="bi bi-arrow-right-circle me-2"></i>Ver Contactos
+                </a>
+            </div>
+        </div>
+
+        <!-- Mi Perfil -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 p-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="avatar text-white" style="width:48px;height:48px;font-size:1.3rem;background:#7c3aed;">
+                        <i class="bi bi-person-fill-gear"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Mi Perfil</h6>
+                        <span class="text-muted small">Cuenta de usuario</span>
+                    </div>
+                </div>
+                <p class="text-muted small mb-4">
+                    Actualiza tu nombre, apellidos y nombre de usuario.
+                </p>
+                <a th:href="@{/users/{id}/edit(id=${session.usuarioSesion.id})}"
+                   class="btn btn-outline-secondary mt-auto">
+                    <i class="bi bi-pencil me-2"></i>Editar Perfil
+                </a>
+            </div>
+        </div>
+
+        <!-- Usuarios -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 p-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="avatar text-white" style="width:48px;height:48px;font-size:1.3rem;background:#0891b2;">
+                        <i class="bi bi-person-lines-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Usuarios</h6>
+                        <span class="text-muted small">Administración</span>
+                    </div>
+                </div>
+                <p class="text-muted small mb-4">
+                    Consulta todos los usuarios registrados en el sistema.
+                </p>
+                <a th:href="@{/users}" class="btn btn-outline-secondary mt-auto">
+                    <i class="bi bi-list-ul me-2"></i>Ver Usuarios
+                </a>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
+</file>
+
+<file path="src/main/resources/application.properties">
+spring.datasource.url=jdbc:postgresql://localhost:5432/agenda-web
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+spring.datasource.configuration.maximum-pool-size=2
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.hibernate.ddl-auto=none
+
+spring.mvc.hiddenmethod.filter.enabled=true
+</file>
+
+<file path="src/main/webapp/css/main.css">
+h1 {
+    color: red;
+}
+
+h2 {
+    color: blue;
+}
+
+h3 {
+    color: green;
+}
+</file>
+
+<file path="src/main/webapp/WEB-INF/web.xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app
+    version="4.0"
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:javaee="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:xml="http://www.w3.org/XML/1998/namespace"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd">
+  <display-name>Archetype Created Web Application</display-name>
+</web-app>
+</file>
+
+<file path="docker-compose.yml">
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: agenda-web
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Cambiamos init.sql por tu archivo real de tablas:
+      - ./database/create.sql:/docker-entrypoint-initdb.d/01-create.sql
+      # Seed para poblar la bdd
+      - ./database/poblado.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agenda-web"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      network: host
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/agenda-web
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      db:
+        condition: service_healthy
+
+    develop:
+      watch:
+        # Sincroniza vistas HTML de Thymeleaf inmediatamente
+        - path: ./src/main/resources/templates
+          action: sync
+          target: /app/src/main/resources/templates
+        # ─── CAMBIA ESTA LÍNEA (Agrega src/main/) ───
+        - path: ./src/main/webapp
+          action: sync
+          target: /app/webapp
+        # Si modificas dependencias, reconstruye todo
+        - path: ./pom.xml
+          action: rebuild
+        # Si modificas lógica en clases Java, reconstruye todo
+        - path: ./src/main/java
+          action: rebuild
+
+volumes:
+  postgres_data:
+</file>
+
+<file path="Dockerfile">
+FROM maven:3.9-eclipse-temurin-21
+
+WORKDIR /app
+
+# 1. Copiar configuración de dependencias y descargarlas en caché
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# 2. Copiar el código fuente y carpetas de la vista
+COPY src ./src
+# ─── CAMBIA ESTA LÍNEA ───
+COPY src/main/webapp ./webapp
+
+EXPOSE 8080
+
+# 3. Ejecutar el código directamente con Maven en modo desarrollo
+ENTRYPOINT ["mvn", "spring-boot:run"]
+</file>
+
+<file path="pom.xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.5</version> <!-- 3.5.14 Compatible con Java 21 -->
+    <relativePath/>
+  </parent>
+  <groupId>mx.ipn.upiicsa.web</groupId>
+  <artifactId>ejemplo-04</artifactId>
+  <version>v0.0.1</version>
+  <packaging>jar</packaging>
+  <name>ejemplo-04</name>
+  <url>http://www.example.com</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <java.version>21</java.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.46</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.7.11</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <finalName>ejemplo-04</finalName>
+
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.4.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.3.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.13.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.3.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>3.1.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>3.1.2</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
+</file>
+
+</files>

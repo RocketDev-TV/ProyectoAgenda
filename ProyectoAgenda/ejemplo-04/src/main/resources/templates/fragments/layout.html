@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<!-- HEAD MAESTRO -->
+<head th:fragment="head(pageTitle)">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${pageTitle} + ' — Agenda Premium'">Agenda Web</title>
+
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <!-- Estilos personalizados -->
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- NAVBAR MAESTRO -->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-premium sticky-top py-3">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" th:href="@{/welcome}">
+            <i class="bi bi-layers-half fs-4"></i> Agenda Pro
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <i class="bi bi-grid-3x3-gap-fill fs-4 text-secondary"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-4 gap-3">
+                <li class="nav-item"><a class="nav-link" th:href="@{/welcome}"><i class="bi bi-house me-1"></i>Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/contacts}"><i class="bi bi-people me-1"></i>Contactos</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-3" th:if="${session.usuarioSesion != null}">
+                <div class="d-flex align-items-center gap-2 px-3 py-1 bg-light rounded-pill border">
+                    <i class="bi bi-person-circle text-primary fs-5"></i>
+                    <span class="fw-semibold text-secondary" th:text="${session.usuarioSesion.username}">User</span>
+                </div>
+                <a th:href="@{/logout}" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                    <i class="bi bi-box-arrow-right me-1"></i>Salir
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- FOOTER MAESTRO -->
+<footer th:fragment="footer" class="bg-white border-top py-4 mt-5 text-center text-muted small">
+    <div class="container">
+        <p class="mb-0">© 2026 Agenda IPN - UPIICSA.</p>
+    </div>
+</footer>
+
+<!-- SCRIPTS MAESTROS -->
+<th:block th:fragment="scripts">
+    <!-- Puente Thymeleaf → JS: pasa flash-attributes como data-attributes (Thymeleaf NO procesa .js externos) -->
+    <span id="flash-data"
+          th:attr="data-exito=${messageConfirmacion},data-info=${message},data-error=${messageError}"
+          hidden></span>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</th:block>
+
+</body>
+</html>

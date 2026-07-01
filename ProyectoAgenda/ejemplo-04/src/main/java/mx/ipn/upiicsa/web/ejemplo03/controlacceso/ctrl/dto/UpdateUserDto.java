@@ -13,6 +13,7 @@ public class UpdateUserDto {
     private String lastName;
     private String secondLastName;
     private String username;
+    private String password;
 
     public User toEntity() {
         return User.builder()
@@ -20,6 +21,7 @@ public class UpdateUserDto {
                 .lastName(lastName)
                 .secondLastName(secondLastName)
                 .username(username)
+                .password(password)
                 .build();
     }
 
@@ -29,6 +31,7 @@ public class UpdateUserDto {
                 .lastName(entity.getLastName())
                 .secondLastName(entity.getSecondLastName())
                 .username(entity.getUsername())
+                // password no se pre-carga en el formulario por seguridad
                 .build();
     }
 }

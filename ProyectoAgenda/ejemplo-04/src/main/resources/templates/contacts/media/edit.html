@@ -1,42 +1,94 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Editar Medio de Contacto</title>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Editar Medio')}">
 </head>
+
 <body>
-<div>
-    <h2>Editar Medio de Contacto</h2>
+<div th:replace="~{fragments/layout :: navbar}"></div>
 
-    <!--
-        PUT via form HTML: Spring MVC intercepta el campo oculto _method=PUT
-        gracias a HiddenHttpMethodFilter (ya habilitado en application.properties).
-        La acción apunta a /contacts/{idContact}/media/{id} con el id del medio.
-    -->
-    <form th:action="@{/contacts/{idContact}/media/{id}(idContact=${idContact}, id=${updateContactMediumDto.id})}"
-          th:object="${updateContactMediumDto}"
-          method="POST">
+<main class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
 
-        <input type="hidden" name="_method" value="PUT" />
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/contacts}" class="text-brand text-decoration-none">Contactos</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/contacts/{id}/media(id=${idContact})}"
+                           class="text-brand text-decoration-none">Medios</a>
+                    </li>
+                    <li class="breadcrumb-item active">Editar</li>
+                </ol>
+            </nav>
 
-        <div>
-            <label for="type">Tipo de Medio:</label>
-            <select id="type" th:field="*{idType}" required>
-                <option value="" disabled>-- Seleccione una opción --</option>
-                <option th:each="t : ${types}" th:value="${t.id}" th:text="${t.name}"></option>
-            </select>
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-pencil-square me-2"></i>Editar Medio de Contacto</h5>
+                </div>
+                <div class="card-body p-4">
+                    <!--
+                        PUT via hidden _method.
+                        El id del medio se toma del DTO (puesto en modelo por el controlador),
+                        que es el mismo valor que el path variable. Se usa para construir la URL.
+                    -->
+                    <form th:action="@{/contacts/{ic}/media/{id}(ic=${idContact},id=${updateContactMediumDto.id})}"
+                          th:object="${updateContactMediumDto}"
+                          method="POST">
+                        <input type="hidden" name="_method" value="PUT"/>
+
+                        <!-- Tipo -->
+                        <div class="mb-4">
+                            <label for="idType" class="form-label">
+                                <i class="bi bi-tag text-brand me-1"></i>Tipo de Medio *
+                            </label>
+                            <select id="idType"
+                                    th:field="*{idType}"
+                                    class="form-select"
+                                    required>
+                                <option value="" disabled>— Selecciona un tipo —</option>
+                                <option th:each="t : ${types}"
+                                        th:value="${t.id}"
+                                        th:text="${t.name}">Tipo</option>
+                            </select>
+                        </div>
+
+                        <!-- Valor -->
+                        <div class="mb-4">
+                            <label for="value" class="form-label">
+                                <i class="bi bi-input-cursor-text text-brand me-1"></i>Valor *
+                            </label>
+                            <input type="text" id="value"
+                                   th:field="*{value}"
+                                   class="form-control"
+                                   placeholder="ej. correo@email.com ó 5512345678"/>
+                            <div class="form-text text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Ingresa un correo válido o un número de 10 dígitos.
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-brand px-4">
+                                <i class="bi bi-floppy me-2"></i>Guardar Cambios
+                            </button>
+                            <a th:href="@{/contacts/{id}/media(id=${idContact})}"
+                               class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg me-1"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </div>
-        <br>
-        <div>
-            <label for="value">Valor / Cuenta / Teléfono:</label>
-            <input type="text" id="value" th:field="*{value}" required />
-        </div>
-        <br>
-        <div>
-            <button type="submit">Actualizar Medio</button>
-            <a th:href="@{/contacts/{id}/media(id=${idContact})}">Cancelar</a>
-        </div>
-    </form>
-</div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

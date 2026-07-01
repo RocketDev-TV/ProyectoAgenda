@@ -1,37 +1,132 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org" lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Inicio - Mi Proyecto MVC</title>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head th:replace="~{fragments/layout :: head('Usuarios')}">
 </head>
+
 <body>
-<h1>Gestión de usuarios</h1>
-<table>
-    <thead>
-    <tr>
-        <!--<th>ID</th>-->
-        <th>Nombre</th>
-        <th>Primer Apellido</th>
-        <th>Segundo Apellido</th>
-        <th>Usuario (Username)</th>
-        <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- th:each se encarga de repetir este <tr> por cada persona en la lista -->
-    <tr th:each="persona : ${personas}">
-        <!--<td th:text="${persona.id}">1</td>-->
-        <td th:text="${persona.name}">Juan</td>
-        <td th:text="${persona.lastName}">Pérez</td>
-        <td th:text="${persona.secondLastName}">Gómez</td>
-        <td th:text="${persona.username}">juanpg</td>
-        <td><a th:href="@{/users/{id}/edit(id=${persona.id})}">Editar</a>
-            <!--<a th:href="@{/users/{id}/destroy(id=${persona.id})}">Eliminar</a>-->
-        <td>
-    </tr>
-    </tbody>
-</table>
-<a th:href="@{/register/new}">Registrar</a>
-<a th:href="@{/welcome}">Regresar</a>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3 page-header">
+        <div>
+            <h3><i class="bi bi-person-lines-fill text-brand me-2"></i>Usuarios del Sistema</h3>
+            <p>Listado de todas las cuentas registradas</p>
+        </div>
+        <a th:href="@{/register/new}" class="btn btn-brand">
+            <i class="bi bi-person-plus-fill me-2"></i>Nuevo Usuario
+        </a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th class="ps-4">Usuario</th>
+                        <th class="d-none d-md-table-cell">Apellidos</th>
+                        <th class="text-center pe-4" style="width:130px;">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <!-- Sin usuarios -->
+                    <tr th:if="${#lists.isEmpty(personas)}">
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <i class="bi bi-people"></i>
+                                <strong class="d-block mb-1">Sin usuarios</strong>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Filas -->
+                    <tr th:each="persona : ${personas}">
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar text-white" style="width:38px;height:38px;flex-shrink:0;background:#7c3aed;">
+                                    <span th:text="${#strings.substring(persona.username,0,1).toUpperCase()}">U</span>
+                                </div>
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="fw-semibold" th:text="${persona.username}">usuario</span>
+                                        <!-- Badge: usuario en sesión -->
+                                        <span th:if="${session.usuarioSesion != null and session.usuarioSesion.id == persona.id}"
+                                              class="chip chip-blue" style="font-size:.7rem;">
+                                            <i class="bi bi-person-check-fill"></i> Tú
+                                        </span>
+                                    </div>
+                                    <div class="text-muted small" th:text="${persona.name}">nombre</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="d-none d-md-table-cell text-muted"
+                            th:text="${persona.lastName + (persona.secondLastName != null ? ' ' + persona.secondLastName : '')}">
+                            Apellidos
+                        </td>
+                        <td class="text-center pe-4">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a th:href="@{/users/{id}/edit(id=${persona.id})}"
+                                   class="btn btn-sm btn-outline-secondary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger js-delete-user"
+                                        th:attr="data-form='del-u-' + ${persona.id},
+                                                 data-username=${persona.username}">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                                <form th:id="'del-u-' + ${persona.id}"
+                                      th:action="@{/users/{id}(id=${persona.id})}"
+                                      method="POST" style="display:none;">
+                                    <input type="hidden" name="_method" value="DELETE"/>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a th:href="@{/welcome}" class="text-muted small">
+            <i class="bi bi-arrow-left me-1"></i>Volver al inicio
+        </a>
+    </div>
+</main>
+
+<script>
+    document.querySelectorAll('.js-delete-user').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var formId   = this.getAttribute('data-form');
+            var username = this.getAttribute('data-username');
+            Swal.fire({
+                title: '¿Eliminar usuario?',
+                html: 'Se eliminará la cuenta de <strong>@' + username + '</strong>. Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="bi bi-trash3 me-1"></i>Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                customClass: { popup: 'rounded-3', confirmButton: 'btn btn-sm', cancelButton: 'btn btn-sm btn-secondary' },
+                buttonsStyling: false
+            }).then(function(r) {
+                if (r.isConfirmed) document.getElementById(formId).submit();
+            });
+        });
+    });
+</script>
+
+<div th:replace="~{fragments/layout :: footer}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

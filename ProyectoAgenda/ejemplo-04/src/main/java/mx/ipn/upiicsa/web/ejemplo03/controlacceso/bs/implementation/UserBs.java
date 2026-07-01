@@ -43,7 +43,10 @@ public class UserBs {
             userSaved.setLastName(user.getLastName());
             userSaved.setSecondLastName(user.getSecondLastName());
             userSaved.setUsername(user.getUsername());
-            log.info("Usuario BS: {}",userSaved.getPassword());
+            if (user.getPassword() != null && !user.getPassword().isBlank()) {
+                userSaved.setPassword(user.getPassword());
+            }
+            log.info("Usuario BS actualizado: {}", userSaved.getUsername());
             userDao.save(userSaved);
             return true;
         }
